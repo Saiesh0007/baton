@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useStore } from '../store';
 import type { ClaimStatus, ClaimType } from '../types';
 import ClaimCard from '../components/ClaimCard';
-import { STATUS_META, TYPE_LABEL, Empty, EvidenceList } from '../ui';
+import { Empty, EvidenceList } from '../ui';
+import { STATUS_META, TYPE_LABEL } from '../meta';
 import { fmtDate } from '../lib/text';
 
 export default function Ledger({ go }: { go: (p: string) => void }) {

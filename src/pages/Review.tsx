@@ -3,7 +3,8 @@ import { useStore } from '../store';
 import type { Claim, ClaimType, ReviewRecord, ReviewState } from '../types';
 import ClaimCard from '../components/ClaimCard';
 import { riskRank } from '../lib/analyze';
-import { TYPE_LABEL, Empty } from '../ui';
+import { Empty } from '../ui';
+import { TYPE_LABEL } from '../meta';
 import { fmtDate, uid } from '../lib/text';
 
 export default function Review({ go }: { go: (p: string) => void }) {
@@ -154,7 +155,7 @@ export default function Review({ go }: { go: (p: string) => void }) {
               ) : isReviewer ? (
                 <div className="actions row gap wrap">
                   <button className="btn sm ok" disabled={!!block || c.review === 'approved'} title={block} onClick={() => setReview(c, 'approved')}>✓ Approve</button>
-                  <button className="btn sm" onClick={() => { setEditing(c.id); setDraft(c.statement); }}>✎ Edit</button>
+                  <button className="btn sm" onClick={() => { setEditing(c.id); setDraft(c.statement); }}>Edit</button>
                   <button className="btn sm bad" disabled={c.review === 'rejected'} onClick={() => setReview(c, 'rejected')}>✕ Reject</button>
                   {c.review !== 'pending' && <button className="btn ghost sm" onClick={() => setReview(c, 'pending')}>Undo</button>}
                   {c.versions.length > 0 && <button className="btn ghost sm" onClick={() => setHistory(history === c.id ? null : c.id)}>History ({c.versions.length})</button>}

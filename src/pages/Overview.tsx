@@ -1,6 +1,7 @@
 import { useStore } from '../store';
 import { FIELDS, type FieldCell } from '../types';
-import { STATUS_META } from '../ui';
+import { Tick } from '../ui';
+import { STATUS_META } from '../meta';
 import { fmtDate } from '../lib/text';
 
 const CELL: Record<FieldCell['state'], { label: string; cls: string }> = {
@@ -20,6 +21,7 @@ export default function Overview({ go }: { go: (p: string) => void }) {
   const pending = live.filter((c) => c.review === 'pending').length;
   const approved = live.filter((c) => c.review === 'approved').length;
   const redactions = project.sources.reduce((n, s) => n + s.redactions.reduce((m, r) => m + r.count, 0), 0);
+  const filled = a.fields.filter((f) => f.state === 'filled').length;
 
   const next = !project.sources.length
     ? { text: 'Import at least one source to build the claim ledger.', page: 'sources', cta: 'Connect sources' }
@@ -29,50 +31,57 @@ export default function Overview({ go }: { go: (p: string) => void }) {
         ? { text: `${pending} claims are waiting for review.`, page: 'review', cta: 'Open review queue' }
         : { text: project.published ? `Handover v${project.published.version} is published.` : 'Everything is reviewed and ready to publish.', page: project.published ? 'handover' : 'review', cta: project.published ? 'View handover' : 'Publish' };
 
+  const statuses = Object.keys(STATUS_META) as (keyof typeof STATUS_META)[];
+
   return (
     <div className="stack">
-      <div className="card next">
-        <div>
-          <div className="kicker">Next step</div>
-          <div className="lead">{next.text}</div>
-        </div>
-        <button className="btn primary" onClick={() => go(next.page)}>{next.cta} →</button>
-      </div>
-
-      <div className="stats">
-        <div className="stat big">
-          <div className="ring" style={{ ['--p' as string]: a.readiness }}><span>{a.readiness}%</span></div>
-          <div>
-            <div className="stat-l">Handover readiness</div>
-            <div className="muted small">Share of required template fields backed by a Corroborated, Cited or Leaver-attested claim.</div>
+      <section className="readiness">
+        <div className="rd-figure">
+          <div className="rd-n">{a.readiness}<span>%</span></div>
+          <div className="rd-copy">
+            <p className="rd-line">of {project.people.successor}'s handover is backed by evidence.</p>
+            <p className="muted small">{filled} of {a.fields.length} required template fields hold a Corroborated, Cited or Leaver-attested claim.</p>
+            <div className="rd-track" aria-hidden="true"><div style={{ width: `${a.readiness}%` }} /></div>
           </div>
         </div>
-        <div className="stat"><div className="stat-n">{project.sources.length}</div><div className="stat-l">sources · {a.chunks.length} events</div></div>
-        <div className="stat"><div className="stat-n">{live.length}</div><div className="stat-l">claims in ledger</div></div>
-        <div className="stat"><div className="stat-n">{open}</div><div className="stat-l">open interview questions</div></div>
-        <div className="stat"><div className="stat-n">{approved}/{live.length}</div><div className="stat-l">approved by reviewer</div></div>
-        <div className="stat"><div className="stat-n">{redactions}</div><div className="stat-l">secrets / PII masked at import</div></div>
-      </div>
+        <div className="rd-next">
+          <p>{next.text}</p>
+          <button className="btn primary" onClick={() => go(next.page)}>{next.cta} →</button>
+        </div>
+      </section>
 
-      <div className="card">
-        <div className="row between wrap">
+      <dl className="figures">
+        <div><dt>Sources</dt><dd>{project.sources.length}</dd></div>
+        <div><dt>Events</dt><dd>{a.chunks.length}</dd></div>
+        <div><dt>Claims in ledger</dt><dd>{live.length}</dd></div>
+        <div><dt>Open questions</dt><dd>{open}</dd></div>
+        <div><dt>Approved</dt><dd>{approved}<span className="muted">/{live.length}</span></dd></div>
+        <div><dt>Secrets masked at import</dt><dd>{redactions}</dd></div>
+      </dl>
+
+      <section className="card">
+        <div className="card-head">
           <h3>Evidence status of every claim</h3>
           <span className="muted small">Assigned by rules, never by the AI's own confidence</span>
         </div>
         <div className="statusbar">
-          {(Object.keys(STATUS_META) as (keyof typeof STATUS_META)[]).map((s) => (
-            a.stats[s] ? <div key={s} className={`seg s-${STATUS_META[s].cls}`} style={{ flex: a.stats[s] }} title={`${STATUS_META[s].label}: ${a.stats[s]}`} /> : null
+          {statuses.map((s) => (
+            a.stats[s] ? <div key={s} className={`seg sg-${s}`} style={{ flex: a.stats[s] }} title={`${STATUS_META[s].label}: ${a.stats[s]}`} /> : null
           ))}
         </div>
-        <div className="legend">
-          {(Object.keys(STATUS_META) as (keyof typeof STATUS_META)[]).map((s) => (
-            <div key={s} className="lg"><span className={`dot s-${STATUS_META[s].cls}`} /> <b>{STATUS_META[s].label}</b> {a.stats[s]} <span className="muted small">· {STATUS_META[s].help}</span></div>
+        <ul className="legend">
+          {statuses.map((s) => (
+            <li key={s}>
+              <span className="lg-tick"><Tick s={s} /></span>
+              <span className="lg-n">{a.stats[s]}</span>
+              <span><b>{STATUS_META[s].label}</b> <span className="muted">{STATUS_META[s].help}</span></span>
+            </li>
           ))}
-        </div>
-      </div>
+        </ul>
+      </section>
 
-      <div className="card">
-        <div className="row between wrap">
+      <section className="card">
+        <div className="card-head">
           <h3>Handover template coverage</h3>
           <span className="muted small">What every workstream must have before a handover is complete</span>
         </div>
@@ -85,10 +94,10 @@ export default function Overview({ go }: { go: (p: string) => void }) {
                 if (w.id === 'general' && cells.every((c) => !c.claimIds.length)) return null;
                 return (
                   <tr key={w.id}>
-                    <td><b>{w.name}</b></td>
+                    <td className="ws-name">{w.name}</td>
                     {FIELDS.map((f) => {
                       const c = cells.find((x) => x.field === f.key)!;
-                      return <td key={f.key}><span className={`cell c-${CELL[c.state].cls}`}>{CELL[c.state].label}</span></td>;
+                      return <td key={f.key}><span className={`cell c-${CELL[c.state].cls}`}>{c.state === 'filled' && '✓ '}{CELL[c.state].label}</span></td>;
                     })}
                   </tr>
                 );
@@ -96,16 +105,16 @@ export default function Overview({ go }: { go: (p: string) => void }) {
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
 
-      <div className="card">
+      <section className="card">
         <h3>Audit log</h3>
         <ul className="audit">
           {project.audit.slice(0, 12).map((e, i) => (
-            <li key={i}><span className="muted small">{fmtDate(e.ts)} {new Date(e.ts).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span> <b>{e.actor}</b> {e.action}</li>
+            <li key={i}><span className="mono muted">{fmtDate(e.ts)} {new Date(e.ts).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span> <span><b>{e.actor}</b> {e.action}</span></li>
           ))}
         </ul>
-      </div>
+      </section>
     </div>
   );
 }

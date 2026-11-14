@@ -75,7 +75,7 @@ function QuestionCard({ n, q, ans, claims, wsName, canAnswer, onSave, a, leaver 
             {claims.map((c, i) => (
               <div key={c.id} className={`side ${ans?.pickedClaimId === c.id ? 'picked' : ''}`}>
                 <div className="kicker">Side {String.fromCharCode(65 + i)}</div>
-                <ClaimCard c={c} a={a} />
+                <ClaimCard c={c} a={a} noConflicts />
                 {canAnswer && !ans && <button className="btn sm" onClick={() => onSave({ choice: 'pick', pickedClaimId: c.id, text: text || undefined })}>This one is current</button>}
               </div>
             ))}

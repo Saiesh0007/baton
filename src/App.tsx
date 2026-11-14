@@ -51,8 +51,8 @@ function Shell() {
     <>
       <Header>
         <div className="proj">
-          <button className="link small" onClick={() => open(null)}>← All handovers</button>
           <div className="proj-name" title={project.description}>{project.name}</div>
+          <button className="link small" onClick={() => open(null)}>All handovers</button>
         </div>
         <div className="roles" role="group" aria-label="View as">
           <span className="muted small">View as</span>
@@ -73,7 +73,7 @@ function Shell() {
           </button>
         ))}
         <div className="spacer" />
-        <div className="readiness-chip" title="Handover readiness">Readiness <b>{analysis.readiness}%</b></div>
+        {page !== 'overview' && <div className="readiness-chip" title="Share of required template fields backed by evidence">Readiness <b>{analysis.readiness}%</b></div>}
       </nav>
       <main className="wrap">
         <Page go={go} />
@@ -88,7 +88,10 @@ function Header({ children }: { children?: React.ReactNode }) {
   return (
     <header className="top">
       <div className="wrap top-in">
-        <button className="logo" onClick={() => open(null)} aria-label="Baton home">Baton<span>.</span></button>
+        <button className="logo" onClick={() => open(null)} aria-label="Baton home">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="2" y="9.5" width="20" height="5" rx="2.5" transform="rotate(-35 12 12)" fill="currentColor" /><rect x="9.6" y="9.5" width="4.8" height="5" transform="rotate(-35 12 12)" fill="var(--paper)" opacity=".55" /></svg>
+          Baton
+        </button>
         {children}
       </div>
     </header>

@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import { useStore } from '../store';
 import type { Claim, Chunk, PublishedSnapshot, Source } from '../types';
 import { FIELDS } from '../types';
-import { EvidenceList, StatusPill, TypeTag, Empty, download, TYPE_LABEL } from '../ui';
+import { EvidenceList, StatusPill, TypeTag, Empty, Lock } from '../ui';
+import { download, TYPE_LABEL } from '../meta';
 import { fmtDate, hash, terms, uid } from '../lib/text';
 
 const DATE_RE = /\b(\d{1,2}\s+[A-Z][a-z]{2,8}\.?\s+\d{4}|\d{4}-\d{2}-\d{2}|before (I leave|the fest)|deadline|expires?)\b/i;
@@ -136,13 +137,13 @@ export default function Handover({ go }: { go: (p: string) => void }) {
 
   const itemRow = (c: Claim) => (
     <li key={c.id} className="hitem">
-      <div className="row gap wrap">
+      <div className="row gap wrap hmeta">
         <StatusPill s={c.status} />
         {c.edited && <span className="pill p-warn" title="Edited by reviewer">edited</span>}
-        <span className="hstmt">{c.statement}</span>
         <span className="spacer" />
         {ackBtns(c.id)}
       </div>
+      <p className="hstmt">{c.statement}</p>
       {noteFor === c.id && noteBox(c.id)}
       <EvidenceList claim={c} chunkById={view.chunkById} sourceById={view.sourceById} />
     </li>
@@ -166,9 +167,9 @@ export default function Handover({ go }: { go: (p: string) => void }) {
           <div className="muted small">v{snap.version} · approved by {snap.by} · published {fmtDate(snap.ts)} · {visible.length} approved items · {shadows.length} restricted</div>
         </div>
         <div className="row gap wrap">
-          <div className="mini-ring" style={{ ['--p' as string]: snap.readiness }}><span>{snap.readiness}%</span></div>
-          <div className="muted small">readiness<br />{ackedCount}/{visible.length + planU.length} acknowledged</div>
-          <button className="btn sm" onClick={exportMd}>⬇ Export Markdown</button>
+          <div className="hfig"><b>{snap.readiness}%</b><span className="muted small">readiness</span></div>
+          <div className="hfig"><b>{ackedCount}/{visible.length + planU.length}</b><span className="muted small">acknowledged</span></div>
+          <button className="btn sm" onClick={exportMd}>Export Markdown</button>
         </div>
       </div>
 
@@ -216,7 +217,7 @@ export default function Handover({ go }: { go: (p: string) => void }) {
                   );
                 })}
                 {sh.map((s) => (
-                  <div key={s.id} className="shadow">🔒 A <b>{TYPE_LABEL[s.type].toLowerCase()}</b> about {w.name} exists in a restricted source. <b>Ask: {ppl.reviewer}</b></div>
+                  <div key={s.id} className="shadow"><Lock /> A <b>{TYPE_LABEL[s.type].toLowerCase()}</b> about {w.name} exists in a restricted source. <b>Ask: {ppl.reviewer}</b></div>
                 ))}
               </section>
             );
@@ -258,7 +259,7 @@ export default function Handover({ go }: { go: (p: string) => void }) {
             <div className="card shadowbox">
               <h3>Knowledge shadows ({shadows.length})</h3>
               <p className="muted small">These exist in sources you can't access. You can see that they exist, but not what they say.</p>
-              <ul>{shadows.map((s) => <li key={s.id}>🔒 {TYPE_LABEL[s.type]} · {wsName.get(s.workstream)} · ask {ppl.reviewer}</li>)}</ul>
+              <ul>{shadows.map((s) => <li key={s.id}><Lock /> {TYPE_LABEL[s.type]} · {wsName.get(s.workstream)} · ask {ppl.reviewer}</li>)}</ul>
             </div>
           )}
         </aside>

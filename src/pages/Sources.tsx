@@ -3,7 +3,7 @@ import { useStore } from '../store';
 import type { Chunk, Source, Visibility } from '../types';
 import { fetchGithub, ingestFile, parseChat, parseGithub, parseNotes, parseTasks, type Ingested } from '../lib/ingest';
 import { SAMPLE_FILES } from '../lib/demo';
-import { download } from '../ui';
+import { download } from '../meta';
 import { fmtDate } from '../lib/text';
 
 const KIND_LABEL: Record<Source['kind'], string> = { notes: 'Notes / docs', chat: 'Chat export', github: 'GitHub', tasks: 'Task records', interview: 'Exit interview' };
@@ -85,8 +85,8 @@ export default function Sources({ go }: { go: (p: string) => void }) {
           {project.sources.length > 0 && <button className="btn primary" onClick={() => go('ledger')}>See claim ledger →</button>}
         </div>
         <p className="muted">
-          Everything is normalised into events (who, when, text, link). API keys, tokens, emails and phone numbers are masked <b>before</b>
-          anything is stored or analysed. Each source has a visibility: <b>Team</b> (the successor can see it) or <b>Leads only</b>
+          Everything is normalised into events (who, when, text, link). API keys, tokens, emails and phone numbers are masked <b>before</b>{' '}
+          anything is stored or analysed. Each source has a visibility: <b>Team</b> (the successor can see it) or <b>Leads only</b>{' '}
           (the successor sees a “knowledge shadow” instead of the content).
         </p>
 
@@ -185,7 +185,7 @@ function SourceRow({ s, ev, claims, expanded, toggle, setVisibility, remove }: {
         <td>
           <select value={s.visibility} onChange={(e) => setVisibility(s.id, e.target.value as Visibility)} className={s.visibility === 'leads' ? 'restricted' : ''}>
             <option value="team">Team</option>
-            <option value="leads">🔒 Leads only</option>
+            <option value="leads">Leads only</option>
           </select>
         </td>
         <td><button className="btn ghost sm" onClick={() => remove(s.id)}>Remove</button></td>

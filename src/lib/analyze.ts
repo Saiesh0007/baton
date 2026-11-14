@@ -13,7 +13,7 @@ const PATTERNS: { type: ClaimType; re: RegExp }[] = [
   { type: 'risk', re: /\b(risk|risky|expires?|expiry|expiring|fragile|careful|don'?t touch|single point|will break|breaks|quota|rate.?limit|outage|critical|times? out|timeout|personal (card|account|drive)|security)\b/i },
   { type: 'dependency', re: /\b(depends on|dependency|dependent on|waiting (on|for)|blocked (by|on)|notice|vendor|third.party|requires|relies on)\b/i },
   { type: 'decision', re: /\b(decided|decision|going with|we('| wi)ll use|switch(ed|ing)? to|mov(e|ed|ing) (\w+ ){0,3}to|chose|chosen|dropping|dropped|drop|agreed|finali[sz]ed|re-?enable[sd]?|rejected|replac(e|ed|ing)|migrat(e|ed|ing))\b/i },
-  { type: 'owner', re: /\b(owns|owner\s*[:\-]|is handling|will handle|handles|in charge of|responsible for|maintains|maintainer|point of contact|poc\b)/i },
+  { type: 'owner', re: /\b(owns|owner\s*[:-]|is handling|will handle|handles|in charge of|responsible for|maintains|maintainer|point of contact|poc\b)/i },
   { type: 'contact', re: /\b(contact|reach out to|talk to|liaison|coordinator)\b/i },
   { type: 'task', re: /\b(todo|to-do|next step|need to|needs to|have to|pending|remaining|follow up|still to|must be (moved|renewed|done|fixed))\b/i },
   { type: 'status', re: /\b(done|completed?|in progress|wip|deployed|is live|went live|shipped|merged|half.done|not started|blocked|released)\b/i },
