@@ -8,6 +8,15 @@ import { BandStat } from '../ui';
 import { Explain } from '../motion';
 import { fmtDate } from '../lib/text';
 
+const SNAPSHOT_DATE = '14 Nov 2026';
+const SNAPSHOTS = [
+  { key: 'request', repo: 'request/request', note: 'Deprecated in Feb 2020' },
+  { key: 'node-sass', repo: 'sass/node-sass', note: 'Reached end of life' },
+  { key: 'moment', repo: 'moment/moment', note: 'Legacy project in maintenance mode' },
+  { key: 'request-promise', repo: 'request/request-promise', note: 'Deprecated with request' },
+  { key: 'multer', repo: 'expressjs/multer', note: 'Active project' },
+];
+
 const KIND_LABEL: Record<Source['kind'], string> = { notes: 'Notes / docs', chat: 'Chat export', github: 'GitHub', tasks: 'Task records', interview: 'Exit interview' };
 
 export default function Sources({ go }: { go: (p: string) => void }) {
@@ -31,13 +40,30 @@ export default function Sources({ go }: { go: (p: string) => void }) {
     setErr('');
   };
 
+  /* A saved copy of a real public repo, the same data scripts/real.ts evaluates; works offline and past the rate limit. */
+  const loadSnapshot = async (key: string) => {
+    setErr(''); setBusy('Loading saved snapshot…');
+    try {
+      const r = await fetch(`/real/${key}.json`);
+      if (!r.ok) throw new Error('Snapshot not found.');
+      const item = parseGithub(await r.json(), vis);
+      item.source.name += ` (snapshot ${SNAPSHOT_DATE})`;
+      add([item]);
+    } catch (e) { setErr((e as Error).message); }
+    setBusy('');
+  };
+
   const importRepo = async () => {
     setErr(''); setBusy('Connecting to GitHub…');
     try {
       const gh = await fetchGithub(repo, setBusy);
       add([parseGithub(gh, vis)]);
       setRepo('');
-    } catch (e) { setErr((e as Error).message); }
+    } catch (e) {
+      const saved = SNAPSHOTS.find((s) => repo.toLowerCase().includes(s.repo));
+      if (saved && /rate limit/i.test((e as Error).message)) { setRepo(''); await loadSnapshot(saved.key); return; }
+      setErr((e as Error).message);
+    }
     setBusy('');
   };
 
@@ -115,6 +141,12 @@ export default function Sources({ go }: { go: (p: string) => void }) {
                 <button className="btn primary" disabled={!repo || !!busy} onClick={importRepo}>{busy ? 'Importing…' : 'Import'}</button>
               </div>
             </label>
+            <div className="muted small snaps">
+              Real projects, saved {SNAPSHOT_DATE}:{' '}
+              {SNAPSHOTS.map((s) => (
+                <button key={s.key} className="link" disabled={!!busy} onClick={() => loadSnapshot(s.key)} title={s.note}>{s.repo}</button>
+              ))}
+            </div>
             {busy && <div className="muted small">{busy}</div>}
           </div>
         )}

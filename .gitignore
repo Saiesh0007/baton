@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 .vercel
+scripts/real/*.commits.json
+scripts/real/*.issues.json
+scripts/real/*.readme.md

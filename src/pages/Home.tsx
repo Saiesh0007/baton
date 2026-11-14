@@ -15,11 +15,11 @@ function parseWorkstreams(text: string): Workstream[] {
   return ws;
 }
 
-/* Real numbers from scripts/eval.ts on the seeded demo; they count up when they come into view. */
+/* Real numbers: scripts/eval.ts on the seeded demo, scripts/real.ts on public repos; they count up when they come into view. */
 const PROOF: { n: number; of?: number; label: string }[] = [
   { n: 14, of: 14, label: 'planted facts recovered' },
   { n: 2, of: 2, label: 'contradictions caught, no false alarms' },
-  { n: 31, of: 31, label: 'citations found word for word' },
+  { n: 114, of: 114, label: 'quotes verified in 5 real public repos' },
   { n: 0, label: 'secrets left after masking' },
 ];
 

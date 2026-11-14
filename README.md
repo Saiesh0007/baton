@@ -58,8 +58,25 @@ npx tsx scripts/eval.ts   # seeded ground-truth evaluation
 | Citation validity of Cited / Corroborated claims | 100 % (by construction) |
 | Secrets/PII left after redaction | 0 |
 
-Caveat: the extraction rules were developed with this dataset in view, so these numbers are an upper bound. Recall on unseen
-real repositories is lower, and measuring it on held-out data is part of Round 3.
+Caveat: the extraction rules were developed with this dataset in view, so these numbers are an upper bound. The real-data
+check below is the honest number.
+
+## Real-data check (public GitHub repositories)
+
+`scripts/real.ts` runs the same pipeline on saved snapshots of real public repos (latest 60 commits, 50 issues/PRs, README,
+fetched 14 Nov 2026). Three were used while fixing rules; two were held out and fetched only after the rules were frozen.
+Every claim was labelled by hand in [`scripts/real/LABELS.md`](scripts/real/LABELS.md).
+
+| Metric | Result |
+|---|---|
+| Cited quotes found word-for-word in the real source, all 5 repos | **114 / 114** |
+| Lifecycle status found ("request is fully deprecated", "Node Sass has reached end of life", ...) | **4 / 4** repos that have one |
+| Held-out claims judged useful for a successor (request-promise, multer) | **24 / 59 (41 %)** |
+| False contradictions on held-out repos | 1 pair |
+
+The verifier holds on real data; the rules-based proposer is noisy (user support questions and README API text read like
+claims), which is why every claim passes the reviewer queue before a successor sees it. The same snapshots load in the app:
+**Sources → GitHub repo → Real projects, saved 14 Nov 2026**, so the check can be repeated with no network or rate limit.
 
 ## Data & privacy
 

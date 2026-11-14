@@ -9,6 +9,8 @@ import { hash, norm, splitSentences, terms, escapeRe } from './text';
 /* ------------------------------------------------------------------ */
 
 const PATTERNS: { type: ClaimType; re: RegExp }[] = [
+  // project lifecycle comes first: "fully deprecated" is the one status a successor must not miss
+  { type: 'status', re: /\b(deprecated|maintenance mode|no longer (maintained|supported|developed|actively)|legacy project|end[- ]of[- ]life|unmaintained|archived)\b/i },
   { type: 'issue', re: /\b(again|keeps (on )?(failing|breaking|happening|crashing)|recurring|every time|each time|happened before|same bug|flaky|intermittent(ly)?|regress(ion|ed))\b/i },
   { type: 'risk', re: /\b(risk|risky|expires?|expiry|expiring|fragile|careful|don'?t touch|single point|will break|breaks|quota|rate.?limit|outage|critical|times? out|timeout|personal (card|account|drive)|security)\b/i },
   { type: 'dependency', re: /\b(depends on|dependency|dependent on|waiting (on|for)|blocked (by|on)|notice|vendor|third.party|requires|relies on)\b/i },
@@ -22,6 +24,18 @@ const PATTERNS: { type: ClaimType; re: RegExp }[] = [
 const NEG = /\b(drop|dropping|dropped|remov\w*|disabl\w*|stop(ped|ping)?|no longer|not|never|isn'?t|won'?t|cancel\w*|revert\w*|half|incomplete|broken|abandon\w*|paused?|wip|in progress|work in progress)\b/i;
 const polarity = (s: string) => (NEG.test(s) ? -1 : 1);
 const pol = (c: Claim) => polarity(c.evidence[0]?.quote ?? c.statement);
+
+/* Lines that look like code, API reference or an issue-template prompt are not claims. */
+function isNoise(s: string): boolean {
+  if (/^(\/\/|\/\*|<\w|[-*]\s*`|\*\*[^*]+\*\*:?$)/.test(s)) return true;
+  if (/=>|\(\)\s*[;{]|\bfunction\s*\(|;\s*$|please complete the following/i.test(s)) return true;
+  if (/^[`>\s]*(npm|yarn|pnpm)\s+(warn|err!?|error)\b|^(error|warning|warn)\s*[:[]/i.test(s)) return true; // pasted logs
+  if ((s.match(/`/g)?.length ?? 0) >= 4) return true;
+  const letters = s.replace(/[^a-z]/gi, '').length;
+  return letters / s.length < 0.6;
+}
+/* Automated accounts (dependency bots) neither state facts nor own work. */
+export const isBot = (author?: string) => !!author && /\[bot\]$|^(dependabot|renovate|greenkeeper|snyk-bot|github-actions)\b/i.test(author);
 
 function classify(sentence: string): ClaimType | null {
   for (const p of PATTERNS) if (p.re.test(sentence)) return p.type;
@@ -66,7 +80,9 @@ function cap(s: string) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
 export function extractClaims(chunks: Chunk[], ws: Workstream[], names: string[]): Claim[] {
   const out: Claim[] = [];
+  const seen = new Set<string>();
   for (const ch of chunks) {
+    if (isBot(ch.author)) continue;
     if (ch.task) {
       const t = ch.task;
       const w = assignWorkstream(t.title, '', ws);
@@ -80,9 +96,13 @@ export function extractClaims(chunks: Chunk[], ws: Workstream[], names: string[]
     splitSentences(ch.text).forEach((s, i) => {
       if (s.endsWith('?')) return; // questions are not claims
       if (s.split(/\s+/).length < 4) return;
-      if (/^\[REDACTED/.test(s)) return;
+      if (/^\[REDACTED/.test(s) || isNoise(s)) return;
       const type = classify(s);
       if (!type) return;
+      // a commit title repeated in its body is one claim, not two
+      const key = ch.id + '|' + norm(s.replace(/\(#\d+\)/g, ''));
+      if (seen.has(key)) return;
+      seen.add(key);
       const statement = cap(s.replace(/^(feat|fix|chore|docs|refactor|perf|wip)(\([^)]*\))?:\s*/i, '').replace(/^(decision|risk|todo|note)\s*:\s*/i, ''));
       out.push(blankClaim({
         id: 'c-' + hash(ch.id + '|' + i),
@@ -151,6 +171,8 @@ function detectConflicts(claims: Claim[], ws: Workstream[]) {
     for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) {
       const a = list[i], b = list[j];
       if (pol(a) === pol(b)) continue;
+      // two sentences of one message are one voice, not a contradiction
+      if (a.evidence.some((e) => b.evidence.some((f) => f.chunkId === e.chunkId))) continue;
       const o = overlap(tl[i], tl[j]);
       const rare = o.shared.filter((t) => (df.get(t) ?? 0) <= 3 && t.length >= 5 && !generic.has(t));
       if (rare.length >= 1 && o.ratio >= 0.2) {
@@ -168,7 +190,7 @@ function inferOwners(claims: Claim[], chunks: Chunk[], ws: Workstream[], sources
   for (const w of ws) {
     if (claims.some((c) => c.workstream === w.id && c.type === 'owner')) continue;
     if (!w.keywords.length) continue;
-    const related = chunks.filter((ch) => ch.author && kindOf.get(ch.sourceId) !== 'interview' && assignWorkstream(ch.text, '', ws) === w.id && w.keywords.some((k) => norm(ch.text).includes(norm(k))));
+    const related = chunks.filter((ch) => ch.author && !isBot(ch.author) && kindOf.get(ch.sourceId) !== 'interview' && assignWorkstream(ch.text, '', ws) === w.id && w.keywords.some((k) => norm(ch.text).includes(norm(k))));
     const counts = new Map<string, number>();
     related.forEach((ch) => counts.set(ch.author!, (counts.get(ch.author!) ?? 0) + 1));
     const top = [...counts.entries()].filter(([n]) => !skipNames.includes(n)).sort((a, b) => b[1] - a[1])[0];
