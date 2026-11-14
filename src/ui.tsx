@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import type { Chunk, Claim, ClaimStatus, ClaimType, Source } from './types';
 import { escapeRe, fmtDate } from './lib/text';
 import { STATUS_META, TYPE_LABEL } from './meta';
-import { reducedMotion, useFirstSight } from './motion';
+import { CountUp, reducedMotion, useFirstSight } from './motion';
 
 /* Hand-inked strokes. pathLength=1 lets every stroke draw with the same dash maths. */
 const CHECK = 'M2.4 8.8C3.6 9.9 5 11.2 6.1 12.4 8.4 9.2 10.8 6.2 13.8 3.4';
@@ -187,6 +187,17 @@ export function EvidenceList({ claim, chunkById, sourceById, hideRestricted }: {
         <li><button className="ev-more" aria-expanded={all} onClick={() => setAll(!all)}>{all ? 'Show one source' : `+${more} more source${more > 1 ? 's' : ''}`}</button></li>
       )}
     </ul>
+  );
+}
+
+/* The one number a page is about, large, in the dark page band. */
+export function BandStat({ n, suffix = '', label, children }: { n: number; suffix?: string; label: string; children?: ReactNode }) {
+  return (
+    <div className="band-stat">
+      <b><CountUp value={n} suffix={suffix} /></b>
+      <span>{label}</span>
+      {children}
+    </div>
   );
 }
 

@@ -4,7 +4,7 @@ import { useStore } from '../store';
 import type { Claim, ClaimType, ReviewRecord, ReviewState } from '../types';
 import ClaimCard from '../components/ClaimCard';
 import { riskRank } from '../lib/analyze';
-import { Empty, Tick } from '../ui';
+import { BandStat, Empty, Tick } from '../ui';
 import { TYPE_LABEL } from '../meta';
 import { CountUp, EASE_OUT, Explain, reducedMotion, useLater } from '../motion';
 import { PassCtx } from '../components/PassOverlay';
@@ -101,12 +101,16 @@ export default function Review({ go }: { go: (p: string) => void }) {
 
   return (
     <div className="stack">
-      <div className="card">
-        <div className="row between wrap">
+      <div className="card band">
+        <div className="row between wrap band-head">
           <div>
             <div className="kicker">Step 4 · Review</div>
             <h2>Review queue</h2>
           </div>
+          <BandStat n={counts.pending} label={`waiting · ${counts.approved} approved`} />
+        </div>
+        <div className="row between wrap band-tools">
+          <span />
           <div className="row gap wrap">
             <AnimatePresence>
               {flash && (

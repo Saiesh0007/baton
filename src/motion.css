@@ -338,3 +338,74 @@
   *, *::before, *::after { animation-duration: 1ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; transition-delay: 0s !important; }
   .float { animation: none !important; }
 }
+
+/* ============================================================
+   Page bands: every working page opens in the same dark room as
+   the home stage. The band switches to the dark tokens, so its
+   tabs, filters and buttons restyle themselves.
+   ============================================================ */
+.band {
+  --paper: #0e1311; --card: #141b18; --soft: #1d2722; --line: #2b3731; --rule: #222c27;
+  --ink: #e6ece8; --muted: #a0aea5; --faint: #7a887f;
+  --accent: #74c7a1; --accent-2: #8fd8b6; --accent-soft: #17291f; --accent-ink: #0b110e;
+  --margin-rule: #24402f; --bad: #f08a80; --bad-soft: #2d1714; --warn: #e2b25d; --warn-soft: #2a2111;
+  --grey: #9aa69e; --grey-soft: #1e2622; --hl: #1f4030;
+  color-scheme: dark;
+  color: var(--ink);
+  border-color: transparent;
+  border-radius: 10px;
+  padding: 28px 32px;
+  background:
+    radial-gradient(ellipse 60% 140% at 88% -10%, #1d3b2e 0%, rgba(20, 38, 30, .45) 45%, transparent 75%),
+    var(--stage);
+  box-shadow: 0 30px 60px -40px rgba(10, 15, 13, .7);
+}
+.band .kicker { font: 12px var(--mono); color: var(--accent); margin-bottom: 6px; }
+.band h2 { font-family: var(--serif); font-weight: 500; font-size: clamp(26px, 3vw, 38px); line-height: 1.1; letter-spacing: -.015em; margin: 0 0 6px; }
+.band .lede { color: var(--muted); }
+.band .btn { background: transparent; border-color: rgba(230, 236, 232, .22); color: var(--ink); }
+.band .btn:hover:not(:disabled) { background: rgba(230, 236, 232, .07); border-color: rgba(230, 236, 232, .36); }
+.band .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.band .btn.primary:hover:not(:disabled) { background: var(--accent-2); border-color: var(--accent-2); }
+.band .btn.ghost { border-color: transparent; color: var(--muted); }
+.band input, .band select, .band textarea { background: rgba(255, 255, 255, .04); }
+.band-head { align-items: flex-end; }
+.band-right { display: flex; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
+.band-tools { margin-top: 24px; }
+.band-stat { display: grid; justify-items: end; text-align: right; line-height: 1.1; }
+.band-stat b { font-family: var(--mono); font-weight: 500; font-size: clamp(38px, 4.2vw, 56px); letter-spacing: -.04em; color: var(--accent); }
+.band-stat > span { font-size: 13px; color: var(--muted); margin-top: 6px; }
+.band-ticks { display: flex; gap: 14px; margin-top: 10px; font: 12.5px var(--mono); color: var(--muted); }
+.band-ticks > span { display: inline-flex; align-items: center; gap: 5px; }
+.band .progress { background: rgba(230, 236, 232, .1); }
+.readiness.band { border-bottom: none; padding: 32px; align-items: center; }
+.readiness.band .rd-track { background: rgba(230, 236, 232, .1); }
+.hhead.band .muted { color: var(--muted); }
+@media (max-width: 700px) {
+  .band { padding: 22px 18px; border-radius: 8px; }
+  .band-stat { justify-items: start; text-align: left; }
+  .band-right { width: 100%; justify-content: space-between; }
+  .readiness.band { padding: 22px 18px; }
+}
+
+/* ============================================================
+   Fallbacks: a wrong address and a crash, in the same room.
+   ============================================================ */
+.fallback {
+  min-height: 100vh; display: grid; place-items: center; padding: 48px 16px;
+  color: var(--stage-ink);
+  background: radial-gradient(ellipse 50% 60% at 50% 40%, #1d3b2e 0%, rgba(20, 38, 30, .4) 45%, transparent 75%), var(--stage);
+}
+.fallback-in { max-width: 520px; display: grid; gap: 16px; justify-items: start; }
+.fallback h1 { color: var(--stage-ink); font-size: clamp(34px, 5vw, 52px); margin: 0; }
+.fallback p { color: var(--stage-muted); font-size: 17px; margin: 0 0 8px; }
+.fallback code { background: rgba(255, 255, 255, .08); color: var(--stage-ink); }
+.fallback .btn.primary { background: var(--stage-accent); border-color: var(--stage-accent); color: #0b110e; }
+.fallback-mark { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; border: 1px solid rgba(230, 236, 232, .2); animation: fadeIn .5s both; }
+.fb-q { font: 500 30px var(--mono); color: var(--stage-accent); }
+.fb-neq { color: var(--stage-bad); }
+.fb-neq .inkmark { width: 30px; height: 30px; }
+.fb-neq .inkmark path { animation: draw .5s var(--ease-out) .15s both; }
+.fb-neq .inkmark path:nth-child(2) { animation-delay: .3s; }
+.fb-neq .inkmark path:nth-child(3) { animation-delay: .45s; }
+.fb-err { font: 12px var(--mono); color: var(--stage-faint); white-space: pre-wrap; margin: 8px 0 0; }

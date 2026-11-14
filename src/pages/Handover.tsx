@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useStore } from '../store';
 import type { Claim, Chunk, PublishedSnapshot, Source } from '../types';
 import { FIELDS } from '../types';
-import { EvidenceList, StatusPill, TypeTag, Empty, Lock } from '../ui';
+import { BandStat, EvidenceList, StatusPill, TypeTag, Empty, Lock } from '../ui';
 import { download, TYPE_LABEL } from '../meta';
 import { fmtDate, hash, terms, uid } from '../lib/text';
 
@@ -162,16 +162,15 @@ export default function Handover({ go }: { go: (p: string) => void }) {
   return (
     <div className="stack handover">
       {!isSucc && <div className="alert info">Preview of <b>{ppl.successor}</b>'s view, with leads-only content removed. Switch to <b>Successor</b> to acknowledge items.</div>}
-      <div className="card hhead">
+      <div className="card band hhead">
         <div>
           <div className="kicker">Step 5 · Handover for {ppl.successor}</div>
           <h2>{project.name}</h2>
           <div className="muted small">v{snap.version} · approved by {snap.by} · published {fmtDate(snap.ts)} · {visible.length} approved items · {shadows.length} restricted</div>
         </div>
         <div className="row gap wrap">
-          <div className="hfig"><b>{snap.readiness}%</b><span className="muted small">readiness</span></div>
-          <div className="hfig"><b>{ackedCount}/{visible.length + planU.length}</b><span className="muted small">acknowledged</span></div>
-          <button className="btn sm" onClick={exportMd}>Export Markdown</button>
+          <BandStat n={snap.readiness} suffix="%" label={`readiness · ${ackedCount}/${visible.length + planU.length} acknowledged`} />
+          <button className="btn" onClick={exportMd}>Export Markdown</button>
         </div>
       </div>
 

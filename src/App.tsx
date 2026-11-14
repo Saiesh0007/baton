@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { DrawerProvider } from './ui';
 import { CountUp, PageIn, reducedMotion } from './motion';
 import PassOverlay, { PassCtx, type PassInfo } from './components/PassOverlay';
+import { ErrorBoundary, NotFound } from './components/Fallback';
 import type { Role } from './types';
 import Home from './pages/Home';
 import Overview from './pages/Overview';
@@ -116,11 +117,15 @@ function Footer() {
 }
 
 export default function App() {
+  const path = window.location.pathname.replace(/\/+$/, '');
+  if (path && path !== '/index.html') return <ErrorBoundary><NotFound /></ErrorBoundary>;
   return (
+    <ErrorBoundary>
     <StoreProvider>
       <DrawerProvider>
         <Shell />
       </DrawerProvider>
     </StoreProvider>
+    </ErrorBoundary>
   );
 }

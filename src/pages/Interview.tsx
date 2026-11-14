@@ -4,7 +4,7 @@ import type { Answer, Claim, Question } from '../types';
 import { FIELDS } from '../types';
 import ClaimCard from '../components/ClaimCard';
 import type { Analysis } from '../lib/analyze';
-import { Empty } from '../ui';
+import { BandStat, Empty } from '../ui';
 import { Explain } from '../motion';
 
 export default function Interview({ go }: { go: (p: string) => void }) {
@@ -28,16 +28,21 @@ export default function Interview({ go }: { go: (p: string) => void }) {
 
   return (
     <div className="stack">
-      <div className="card">
-        <div className="kicker">Step 3½ · Ask the leaver</div>
-        <h2>Gap-driven exit interview</h2>
+      <div className="card band">
+        <div className="row between wrap band-head">
+          <div>
+            <div className="kicker">Step 3½ · Ask the leaver</div>
+            <h2>Gap-driven exit interview</h2>
+          </div>
+          <BandStat n={answered} suffix={`/${qs.length}`} label={`answered · readiness ${a.readiness}%`} />
+        </div>
         <p className="lede">Only what the evidence can't answer, for <b>{project.people.leaver}</b>.</p>
         <Explain><p>These are the only questions <b>{project.people.leaver}</b> needs to answer. Each one comes from a conflict, a missing
           template field or an inferred claim. Everything else is already covered by evidence. Answers are stored as a new labelled
           source (<i>Leaver-attested</i>). “I don't know” is a valid answer and stays visible as an honest gap.</p></Explain>
         <div className="progress"><div style={{ width: `${qs.length ? (answered / qs.length) * 100 : 100}%` }} /></div>
         <div className="row between wrap">
-          <span className="muted small">{answered} of {qs.length} answered · readiness now {a.readiness}%</span>
+          <span />
           {!canAnswer && <span className="alert warn inline-alert">You are viewing as <b>{role}</b>. Switch the role to <b>Leaver</b> (top right) to answer.</span>}
           {answered === qs.length && qs.length > 0 && <button className="btn primary" onClick={() => go(role === 'reviewer' ? 'review' : 'overview')}>Done → {role === 'reviewer' ? 'Review' : 'Overview'}</button>}
         </div>

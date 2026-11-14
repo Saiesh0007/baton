@@ -36,7 +36,7 @@ export default function Overview({ go }: { go: (p: string) => void }) {
 
   return (
     <div className="stack">
-      <section className="readiness">
+      <section className="readiness band">
         <div className="rd-figure">
           <div className="rd-n"><CountUp value={a.readiness} /><span className="rd-pct">%</span></div>
           <div className="rd-copy">

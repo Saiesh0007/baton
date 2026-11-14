@@ -4,6 +4,7 @@ import type { Chunk, Source, Visibility } from '../types';
 import { fetchGithub, ingestFile, parseChat, parseGithub, parseNotes, parseTasks, type Ingested } from '../lib/ingest';
 import { SAMPLE_FILES } from '../lib/demo';
 import { download } from '../meta';
+import { BandStat } from '../ui';
 import { Explain } from '../motion';
 import { fmtDate } from '../lib/text';
 
@@ -77,13 +78,16 @@ export default function Sources({ go }: { go: (p: string) => void }) {
 
   return (
     <div className="stack">
-      <div className="card">
-        <div className="row between wrap">
+      <div className="card band">
+        <div className="row between wrap band-head">
           <div>
             <div className="kicker">Step 1 · Connect</div>
             <h2>Sources &amp; access</h2>
           </div>
-          {project.sources.length > 0 && <button className="btn primary" onClick={() => go('ledger')}>See claim ledger →</button>}
+          <div className="band-right">
+            <BandStat n={project.sources.length} label={`sources · ${project.chunks.length} events`} />
+            {project.sources.length > 0 && <button className="btn primary" onClick={() => go('ledger')}>See claim ledger →</button>}
+          </div>
         </div>
         <p className="lede">Notes, chats, GitHub and tasks in. Secrets are masked before anything is stored.</p>
         <Explain><p>Everything is normalised into events (who, when, text, link). API keys, tokens, emails and phone numbers are masked <b>before</b>{' '}

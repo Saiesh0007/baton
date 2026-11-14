@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useStore } from '../store';
 import type { ClaimStatus, ClaimType } from '../types';
 import ClaimCard from '../components/ClaimCard';
-import { Empty, EvidenceList } from '../ui';
+import { BandStat, Empty, EvidenceList, Tick } from '../ui';
 import { STATUS_META, TYPE_LABEL } from '../meta';
 import { Explain } from '../motion';
 import { fmtDate } from '../lib/text';
@@ -34,12 +34,20 @@ export default function Ledger({ go }: { go: (p: string) => void }) {
 
   return (
     <div className="stack">
-      <div className="card">
-        <div className="row between wrap">
+      <div className="card band">
+        <div className="row between wrap band-head">
           <div>
             <div className="kicker">Steps 2–3 · Reconstruct &amp; verify</div>
             <h2>Claim ledger</h2>
           </div>
+          <BandStat n={a.claims.filter((c) => !c.superseded).length} label="claims, each with its evidence status">
+            <span className="band-ticks">
+              {(Object.keys(STATUS_META) as ClaimStatus[]).filter((s) => a.stats[s]).map((s) => <span key={s}><Tick s={s} /> {a.stats[s]}</span>)}
+            </span>
+          </BandStat>
+        </div>
+        <div className="row between wrap band-tools">
+          <span />
           <div className="seg-ctl">
             <button className={view === 'claims' ? 'on' : ''} onClick={() => setView('claims')}>Claims</button>
             <button className={view === 'timeline' ? 'on' : ''} onClick={() => setView('timeline')}>Decision timeline</button>
