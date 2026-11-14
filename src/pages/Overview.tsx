@@ -1,6 +1,7 @@
 import { useStore } from '../store';
 import { FIELDS, type FieldCell } from '../types';
 import { Tick } from '../ui';
+import { CountUp } from '../motion';
 import { STATUS_META } from '../meta';
 import { fmtDate } from '../lib/text';
 
@@ -37,11 +38,11 @@ export default function Overview({ go }: { go: (p: string) => void }) {
     <div className="stack">
       <section className="readiness">
         <div className="rd-figure">
-          <div className="rd-n">{a.readiness}<span>%</span></div>
+          <div className="rd-n"><CountUp value={a.readiness} /><span className="rd-pct">%</span></div>
           <div className="rd-copy">
             <p className="rd-line">of {project.people.successor}'s handover is backed by evidence.</p>
-            <p className="muted small">{filled} of {a.fields.length} required template fields hold a Corroborated, Cited or Leaver-attested claim.</p>
-            <div className="rd-track" aria-hidden="true"><div style={{ width: `${a.readiness}%` }} /></div>
+            <p className="muted small">{filled} of {a.fields.length} template fields hold a verified or leaver-attested claim.</p>
+            <div className="rd-track" aria-hidden="true"><div style={{ ['--w' as string]: a.readiness / 100 }} /></div>
           </div>
         </div>
         <div className="rd-next">
@@ -51,12 +52,12 @@ export default function Overview({ go }: { go: (p: string) => void }) {
       </section>
 
       <dl className="figures">
-        <div><dt>Sources</dt><dd>{project.sources.length}</dd></div>
-        <div><dt>Events</dt><dd>{a.chunks.length}</dd></div>
-        <div><dt>Claims in ledger</dt><dd>{live.length}</dd></div>
-        <div><dt>Open questions</dt><dd>{open}</dd></div>
-        <div><dt>Approved</dt><dd>{approved}<span className="muted">/{live.length}</span></dd></div>
-        <div><dt>Secrets masked at import</dt><dd>{redactions}</dd></div>
+        <div><dt>Sources</dt><dd><CountUp value={project.sources.length} /></dd></div>
+        <div><dt>Events</dt><dd><CountUp value={a.chunks.length} /></dd></div>
+        <div><dt>Claims</dt><dd><CountUp value={live.length} /></dd></div>
+        <div><dt>Open questions</dt><dd><CountUp value={open} /></dd></div>
+        <div><dt>Approved</dt><dd><CountUp value={approved} /><span className="muted">/{live.length}</span></dd></div>
+        <div><dt>Secrets masked</dt><dd><CountUp value={redactions} /></dd></div>
       </dl>
 
       <section className="card">
@@ -66,15 +67,15 @@ export default function Overview({ go }: { go: (p: string) => void }) {
         </div>
         <div className="statusbar">
           {statuses.map((s) => (
-            a.stats[s] ? <div key={s} className={`seg sg-${s}`} style={{ flex: a.stats[s] }} title={`${STATUS_META[s].label}: ${a.stats[s]}`} /> : null
+            a.stats[s] ? <div key={s} className={`seg sg-${s}`} style={{ flex: a.stats[s], ['--i' as string]: statuses.indexOf(s) }} title={`${STATUS_META[s].label}: ${a.stats[s]}`} /> : null
           ))}
         </div>
         <ul className="legend">
           {statuses.map((s) => (
-            <li key={s}>
+            <li key={s} title={STATUS_META[s].help}>
               <span className="lg-tick"><Tick s={s} /></span>
               <span className="lg-n">{a.stats[s]}</span>
-              <span><b>{STATUS_META[s].label}</b> <span className="muted">{STATUS_META[s].help}</span></span>
+              <span>{STATUS_META[s].label}</span>
             </li>
           ))}
         </ul>
@@ -82,14 +83,13 @@ export default function Overview({ go }: { go: (p: string) => void }) {
 
       <section className="card">
         <div className="card-head">
-          <h3>Handover template coverage</h3>
-          <span className="muted small">What every workstream must have before a handover is complete</span>
+          <h3>Template coverage</h3>
         </div>
         <div className="tbl-wrap">
           <table className="tbl matrix">
             <thead><tr><th>Workstream</th>{FIELDS.map((f) => <th key={f.key}>{f.label}</th>)}</tr></thead>
             <tbody>
-              {project.workstreams.map((w) => {
+              {project.workstreams.map((w, row) => {
                 const cells = a.fields.filter((c) => c.workstream === w.id);
                 if (w.id === 'general' && cells.every((c) => !c.claimIds.length)) return null;
                 return (
@@ -97,7 +97,7 @@ export default function Overview({ go }: { go: (p: string) => void }) {
                     <td className="ws-name">{w.name}</td>
                     {FIELDS.map((f) => {
                       const c = cells.find((x) => x.field === f.key)!;
-                      return <td key={f.key}><span className={`cell c-${CELL[c.state].cls}`}>{c.state === 'filled' && '✓ '}{CELL[c.state].label}</span></td>;
+                      return <td key={f.key}><span className={`cell c-${CELL[c.state].cls}`} style={{ ['--d' as string]: `${(row + FIELDS.indexOf(f)) * 28}ms` }}>{c.state === 'filled' && '✓ '}{CELL[c.state].label}</span></td>;
                     })}
                   </tr>
                 );

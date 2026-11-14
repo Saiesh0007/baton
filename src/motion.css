@@ -1,0 +1,340 @@
+/* ============================================================
+   The stage: the home hero. Paper evidence on a dark desk, lit
+   from where the claim is. Uses the dark tokens for the room and
+   the light (paper) tokens for the cards in it.
+   ============================================================ */
+.stage {
+  position: relative;
+  overflow: hidden;
+  color: var(--stage-ink);
+  background:
+    radial-gradient(ellipse 48% 62% at 72% 46%, #1d3b2e 0%, rgba(20, 38, 30, .55) 42%, transparent 72%),
+    radial-gradient(ellipse 90% 70% at 30% 120%, #0f1a15 0%, transparent 70%),
+    var(--stage);
+}
+.stage-in {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  grid-template-areas: "copy scene" "beats scene";
+  grid-template-rows: auto 1fr;
+  column-gap: 24px;
+  min-height: clamp(640px, calc(100vh - 61px), 880px);
+  padding-top: 72px;
+  padding-bottom: 56px;
+}
+.stage-copy { grid-area: copy; align-self: end; position: relative; z-index: 2; }
+.stage h1 { color: var(--stage-ink); font-size: clamp(40px, 4.5vw, 64px); max-width: 12.5ch; margin-bottom: 20px; }
+.stage-lead { color: var(--stage-muted); font-size: 18px; line-height: 1.55; max-width: 34ch; margin: 0 0 28px; }
+.stage .btn.primary { background: var(--stage-accent); border-color: var(--stage-accent); color: #0b110e; }
+.stage .btn.primary:hover:not(:disabled) { background: #8fd8b6; border-color: #8fd8b6; }
+.btn.on-dark { background: transparent; color: var(--stage-ink); border-color: rgba(226, 233, 228, .22); }
+.btn.on-dark:hover:not(:disabled) { background: rgba(226, 233, 228, .07); border-color: rgba(226, 233, 228, .36); }
+.stage-note { color: var(--stage-faint); font-size: 13px; margin: 16px 0 0; }
+.stage-note .link { color: #9fd9bd; margin: 0; }
+.stage :focus-visible { outline-color: var(--stage-accent); }
+
+/* scene + rig: composed at 760 x 640, scaled to fit, tilted by the pointer */
+.scene {
+  grid-area: scene;
+  position: relative;
+  height: 700px;
+  align-self: center;
+  margin-right: -48px;
+  perspective: 1500px;
+  perspective-origin: 34% 42%;
+}
+.rig {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 760px; height: 700px;
+  margin: -350px 0 0 -380px;
+  transform-style: preserve-3d;
+  transform: scale(var(--fit, 1)) rotateX(calc(var(--rx, 9deg) + var(--tilt-x, 0deg))) rotateY(calc(var(--ry, -16deg) + var(--tilt-y, 0deg)));
+  will-change: transform;
+}
+.obj { position: absolute; left: 0; top: 0; transform-style: preserve-3d; }
+.o-notes { width: 360px; transform: translate3d(-24px, 0, -170px) rotateZ(-2.4deg); }
+.o-commit { width: 292px; transform: translate3d(430px, 8px, -110px) rotateZ(2deg); }
+.o-claim { width: 412px; transform: translate3d(150px, 232px, 90px); }
+.o-diya { transform: translate3d(574px, 352px, 150px); }
+.o-chat { width: 296px; transform: translate3d(4px, 530px, -130px) rotateZ(1.8deg); }
+.o-pr { width: 304px; transform: translate3d(424px, 548px, -70px) rotateZ(-1.6deg); }
+.o-question { width: 292px; transform: translate3d(220px, 642px, 40px); }
+
+/* idle: each sheet breathes on its own clock (secondary action) */
+.float { transform-style: preserve-3d; animation: float 7s ease-in-out infinite alternate; }
+.f1 { animation-duration: 6.4s; }
+.f2 { animation-duration: 7.6s; animation-delay: -2s; }
+.f3 { animation-duration: 8.2s; animation-delay: -4s; }
+.f4 { animation-duration: 6.9s; animation-delay: -1s; }
+@keyframes float { from { transform: translate3d(0, -3px, 0); } to { transform: translate3d(0, 4px, 6px); } }
+
+/* paper */
+.sheet {
+  position: relative;
+  transform-style: preserve-3d;
+  background: #f6f8f4;
+  color: #18201c;
+  border-radius: 6px;
+  padding: 14px 16px 15px;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: 0 30px 50px -24px rgba(0, 0, 0, .8), 0 2px 6px rgba(0, 0, 0, .28);
+}
+.o-commit .sheet, .o-pr .sheet { background: #fbfcfa; }
+.sheet p { margin: 0; }
+/* the notes are a stack of pages: two sheets sit under the top one */
+.notes::before, .notes::after { content: ""; position: absolute; inset: 0; border-radius: 6px; }
+.notes::before { background: #dde3da; transform: translate3d(5px, 6px, -6px) rotateZ(1.1deg); }
+.notes::after { background: #c4ccc1; transform: translate3d(10px, 12px, -12px) rotateZ(2.1deg); }
+.s-head { display: flex; justify-content: space-between; gap: 12px; font: 11px var(--mono); color: #58645c; margin-bottom: 8px; }
+.who { display: inline-flex; align-items: center; gap: 6px; }
+.who i { display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: #18201c; color: #f6f8f4; font: 500 9.5px var(--sans); font-style: normal; }
+.who i.merged { background: #1f5c45; }
+.lines { margin: 0; padding-left: 22px; display: grid; gap: 4px; }
+.lines li::marker { font: 11px var(--mono); color: #8a958d; }
+
+/* marker strokes on the quoted words; a wrapped span sweeps line by line */
+.hl {
+  --hlc: #bfe3cc;
+  background-image: linear-gradient(transparent 56%, var(--hlc) 56%);
+  background-repeat: no-repeat;
+  background-position: left;
+  background-size: 0% 100%;
+  transition: background-size .6s var(--ease-out);
+}
+.hl.red { --hlc: #f4cbc5; }
+.on-1 [data-a="notes"], .on-3 [data-a="commit"], .on-5 [data-a="chat"] { background-size: 100% 100%; }
+.on-5 [data-a="pr"] { background-size: 100% 100%; transition-delay: .14s; }
+
+/* the claim */
+.pass-x, .pass-y { transform-style: preserve-3d; }
+.pass-x { transition: transform 1.15s var(--ease-in-out); }
+.claim-3d {
+  position: relative;
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  background: #fbfcfa;
+  color: #18201c;
+  border-radius: 8px;
+  box-shadow: 0 46px 80px -34px rgba(0, 0, 0, .9), 0 4px 12px rgba(0, 0, 0, .3);
+  transition: opacity .5s var(--ease-out);
+}
+.scene:not(.on-1) .claim-3d { opacity: 0; }
+.c-margin { position: relative; border-right: 1px solid #c9dccf; }
+.c-margin .ink { position: absolute; left: 0; right: 0; top: 19px; display: flex; justify-content: center; color: #1f5c45; }
+.c-body { position: relative; padding: 16px 18px 16px; min-width: 0; }
+.c-meta { display: flex; gap: 10px; font-size: 12px; color: #58645c; }
+.c-type { font-family: var(--mono); }
+.c-status { color: #1f5c45; font-weight: 500; opacity: 0; transform: translateY(4px); transition: opacity .3s var(--ease-out), transform .3s var(--ease-out); }
+.on-4 .c-status { opacity: 1; transform: none; transition-delay: .7s; }
+.c-text { font-size: 15px; font-weight: 500; line-height: 1.45; margin: 8px 0 8px; }
+.c-q { display: grid; gap: 1px; padding: 6px 0; opacity: 0; transform: translateX(-16px); transition: opacity .35s var(--ease-out), transform .5s var(--ease-out); }
+.c-q.qb { transform: translateX(16px); }
+.c-q q { font-family: var(--serif); font-size: 13.5px; line-height: 1.4; }
+.c-q small { font: 11px var(--mono); color: #58645c; }
+.on-2 .qa, .on-4 .qb { opacity: 1; transform: none; transition-delay: .5s; }
+
+/* ticks are inked as the quotes land; the second check lags the first (overlapping action) */
+.scene .ink .inkmark path { stroke-dashoffset: 1; transition: stroke-dashoffset .45s var(--ease-out); }
+.scene .i2 { opacity: 0; }
+.on-2 .i1 .inkmark path { stroke-dashoffset: 0; transition-delay: .6s; }
+.on-4 .i1 { opacity: 0; transition: opacity 0s .6s; }
+.on-4 .i2 { opacity: 1; transition: opacity 0s .6s; }
+.on-4 .i2 .inkmark path:first-child { stroke-dashoffset: 0; transition: none; }
+.on-4 .i2 .inkmark path:nth-child(2) { stroke-dashoffset: 0; transition-delay: .66s; }
+
+/* approve: the stamp lifts (anticipation), strikes (squash), settles; the card gives under it */
+.c-stamp {
+  position: absolute; right: 14px; bottom: 12px;
+  font: 500 12px var(--mono); letter-spacing: .12em; text-transform: uppercase;
+  color: #1f5c45; border: 2px solid #1f5c45; border-radius: 3px; padding: 2px 8px;
+  opacity: 0; transform: rotate(-7deg) scale(2.2);
+}
+.on-6 .c-stamp { animation: heroStamp .56s cubic-bezier(.3, 0, .4, 1) both; }
+.on-6 .claim-3d { animation: give .56s ease-out both; }
+@keyframes heroStamp {
+  0% { opacity: 0; transform: rotate(-12deg) scale(2.4); }
+  22% { opacity: .55; transform: rotate(-11deg) scale(2.58); }
+  62% { opacity: 1; transform: rotate(-5deg) scale(.88); }
+  82% { opacity: 1; transform: rotate(-7.5deg) scale(1.06); }
+  100% { opacity: 1; transform: rotate(-7deg) scale(1); }
+}
+@keyframes give { 0%, 56% { transform: translateZ(0); } 66% { transform: translateZ(-16px); } 100% { transform: translateZ(0); } }
+
+/* pass: the claim arcs forward to Diya and is received */
+.on-7 .pass-x { transform: translate3d(318px, 0, 70px); }
+.on-7 .pass-y { animation: passArc 1.15s var(--ease-in-out) forwards; }
+@keyframes passArc {
+  0% { transform: none; opacity: 1; }
+  45% { transform: translateY(-64px) scale(.66) rotateY(10deg); opacity: 1; }
+  86% { opacity: 1; }
+  100% { transform: translateY(22px) scale(.26) rotateY(16deg); opacity: 0; }
+}
+
+/* successor */
+.diya {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px 9px 9px; border-radius: 999px;
+  background: rgba(14, 24, 19, .72); border: 1px solid rgba(226, 233, 228, .2);
+  color: var(--stage-ink); font-size: 13px; white-space: nowrap;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity .4s var(--ease-out), transform .4s var(--ease-out), border-color .3s;
+}
+.diya i { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--stage-accent); color: #0b110e; font: 600 13px var(--sans); font-style: normal; }
+.diya > span { display: grid; line-height: 1.25; }
+.diya b { font-weight: 600; }
+.d-wait, .d-got { grid-area: 2 / 1; font-size: 12px; color: var(--stage-muted); transition: opacity .25s; }
+.d-got { opacity: 0; color: var(--stage-accent); }
+.on-6 .diya { opacity: 1; transform: none; transition-delay: .5s; }
+.on-7 .diya { border-color: var(--stage-accent); transition-delay: 1.05s; animation: receive .5s var(--ease-out) 1.05s both; }
+.on-7 .d-wait { opacity: 0; transition-delay: 1s; }
+.on-7 .d-got { opacity: 1; transition-delay: 1.1s; }
+@keyframes receive { 40% { transform: scale(1.09); } 100% { transform: scale(1); } }
+
+/* conflict */
+.question {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: #fbfcfa; color: #18201c; border-radius: 6px; padding: 10px 12px;
+  font-size: 12.5px; line-height: 1.4;
+  box-shadow: 0 24px 40px -20px rgba(0, 0, 0, .8);
+  transform-origin: 50% 0; transform: rotateX(-90deg); opacity: 0;
+  transition: transform .6s var(--ease-out), opacity .3s;
+}
+.question b { display: block; font-size: 12px; font-weight: 600; color: #ad3128; }
+.q-mark { flex: none; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #f7e4e1; color: #ad3128; font: 500 13px var(--mono); }
+.on-5 .question { transform: none; opacity: 1; transition-delay: 1.3s; }
+
+/* threads: drawn over the scene, recomputed from the cards every frame */
+.threads { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 3; }
+.th { fill: none; stroke: var(--stage-accent); stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .62s var(--ease-in-out), opacity .35s; }
+.th.red { stroke: var(--stage-bad); }
+.on-2 .th-a, .on-4 .th-b { stroke-dashoffset: 0; }
+.on-5 .th-c { stroke-dashoffset: 0; transition-delay: .4s; }
+.on-6 .th-a, .on-6 .th-b, .on-7 .th { opacity: 0; }
+.still .th-a, .still .th-b { opacity: 1; }
+.still .diya { opacity: 0; }
+.neq { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 4; pointer-events: none; }
+.neq span {
+  position: absolute; left: -16px; top: -16px; width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: #2a1513; border: 1px solid var(--stage-bad); color: var(--stage-bad);
+  transform: scale(0);
+}
+.on-5 .neq span { animation: squash .52s var(--ease-out) .95s both; }
+@keyframes squash {
+  0% { transform: scale(0); }
+  55% { transform: scale(1.24, .88); }
+  76% { transform: scale(.94, 1.06); }
+  100% { transform: scale(1); }
+}
+
+/* loop end: what changed lifts off, then the scene resets while nothing is visible */
+.on-8 .hl { background-position: right; background-size: 0% 100%; transition: background-size .45s ease-in; }
+.on-8 .th, .on-8 .question, .on-8 .diya, .on-8 .neq span { opacity: 0; transition: opacity .45s ease-in; }
+.on-8 .diya { animation: none; }
+.snap :not(.float), .snap :not(.float)::before, .snap :not(.float)::after { transition: none !important; animation: none !important; }
+
+/* beats: the three steps, in time with the scene */
+.beats { grid-area: beats; align-self: start; list-style: none; margin: 40px 0 0; padding: 0; display: grid; gap: 2px; max-width: 360px; position: relative; z-index: 2; }
+.beats li { position: relative; display: grid; grid-template-columns: 36px minmax(0, 1fr); padding: 10px 0 11px; color: var(--stage-faint); font-size: 15px; font-weight: 500; transition: color .3s; }
+.beats li span { grid-row: span 2; font: 12px var(--mono); padding-top: 3px; transition: color .3s; }
+.beats li small { font-size: 13px; font-weight: 400; color: #66756c; }
+.beats li.now { color: var(--stage-ink); }
+.beats li.now span { color: var(--stage-accent); }
+.beats li.done { color: var(--stage-muted); }
+.beats li::after, .beats li::before { content: ""; position: absolute; left: 36px; right: 0; bottom: 0; height: 1px; }
+.beats li::after { background: rgba(226, 233, 228, .1); }
+.beats li::before { z-index: 1; background: var(--stage-accent); transform-origin: left; transform: scaleX(0); }
+.beats li.now::before { animation: grow var(--beat, 3s) linear both; }
+.beats li.done::before { transform: scaleX(1); }
+.beats li:nth-child(1) { --beat: 3.9s; }
+.beats li:nth-child(2) { --beat: 2.15s; }
+.beats li:nth-child(3) { --beat: 3.4s; }
+
+/* reduced motion: the composed frame, nothing moving */
+.still .float { animation: none; }
+.still *, .still *::before, .still *::after { transition: none !important; animation-duration: 1ms !important; animation-delay: 0s !important; }
+
+/* ============================================================
+   Publish: the claims square up into one handover and the baton
+   crosses from the leaver to the successor.
+   ============================================================ */
+.pass {
+  position: fixed; inset: 0; z-index: 80; cursor: pointer;
+  display: grid; place-items: center;
+  background: radial-gradient(ellipse 50% 60% at 50% 45%, rgba(29, 59, 46, .92) 0%, rgba(10, 15, 13, .94) 70%);
+  backdrop-filter: blur(4px);
+  color: var(--stage-ink);
+  animation: fadeIn .22s both;
+}
+.pass-in { display: grid; justify-items: center; gap: 32px; perspective: 1100px; }
+.pass-stack { position: relative; width: 280px; height: 168px; transform-style: preserve-3d; }
+.pass-card {
+  position: absolute; inset: 0; display: grid; gap: 10px; align-content: start; padding: 22px;
+  background: #f6f8f4; border-radius: 6px;
+  box-shadow: 0 30px 50px -24px rgba(0, 0, 0, .8), 0 2px 6px rgba(0, 0, 0, .3);
+  animation: cardIn .8s var(--ease-out) both;
+  animation-delay: calc(var(--i) * 70ms);
+}
+.pass-card span { height: 6px; border-radius: 3px; background: #dfe5dc; }
+.pass-card span:nth-child(1) { width: 78%; } .pass-card span:nth-child(2) { width: 56%; } .pass-card span:nth-child(3) { width: 68%; }
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translate3d(calc((var(--i) - var(--n) / 2) * 120px), calc((var(--i) * 2 - var(--n)) * 26px - 40px), 260px)
+      rotateZ(calc((var(--i) - var(--n) / 2) * 10deg)) rotateY(calc((var(--i) - var(--n) / 2) * 14deg));
+  }
+  to { opacity: 1; transform: translate3d(0, calc(var(--i) * -3px), calc(var(--i) * 2px)); }
+}
+.pass-doc {
+  position: absolute; inset: 0; display: grid; place-content: center; gap: 4px; text-align: center;
+  background: #fbfcfa; color: #18201c; border-radius: 6px;
+  box-shadow: 0 40px 70px -30px rgba(0, 0, 0, .9), 0 0 0 1px rgba(116, 199, 161, .5);
+  transform-origin: 50% 0; opacity: 0; transform: translateZ(40px) rotateX(-75deg);
+  animation: docIn .55s var(--ease-out) .95s both;
+}
+.pass-doc b { font-family: var(--serif); font-weight: 500; font-size: 24px; }
+.pass-doc span { color: #58645c; font-size: 13px; }
+@keyframes docIn { to { opacity: 1; transform: translateZ(40px) rotateX(0); } }
+.pass-lane { display: grid; grid-template-columns: auto 220px auto; align-items: center; gap: 16px; font-weight: 600; }
+.pass-track { position: relative; height: 2px; background: rgba(226, 233, 228, .16); }
+.pass-baton {
+  position: absolute; left: 0; top: 0; width: 34px; height: 10px; border-radius: 5px; background: var(--stage-accent);
+  offset-path: path("M17 1 Q 110 -40 203 1"); offset-rotate: auto; offset-distance: 0%;
+  animation: baton .8s var(--ease-in-out) 1.15s both;
+}
+@keyframes baton { to { offset-distance: 100%; } }
+.pass-to { animation: arrive .45s var(--ease-out) 1.95s both; }
+.pass.leaving { animation: passOut .38s ease-in forwards; pointer-events: none; }
+@keyframes passOut { to { opacity: 0; } }
+@keyframes arrive { 45% { transform: scale(1.12); color: var(--stage-accent); } 100% { color: var(--stage-accent); } }
+.pass-line { color: var(--stage-muted); font-size: 14px; margin: 0; animation: fadeIn .35s 1s both; }
+
+/* ============================================================ responsive */
+@media (max-width: 1100px) {
+  .stage-in { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .stage h1 { font-size: clamp(36px, 4.4vw, 50px); }
+  .scene { margin-right: -16px; }
+}
+@media (max-width: 900px) {
+  .stage-in { grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "scene" "beats"; grid-template-rows: auto; min-height: 0; padding-top: 48px; padding-bottom: 40px; }
+  .stage h1 { max-width: 16ch; }
+  .scene { height: 560px; margin: 8px 0 0; }
+  .beats { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: none; gap: 16px; margin-top: 16px; }
+}
+@media (max-width: 700px) {
+  .stage-in { padding-top: 36px; }
+  .stage h1 { font-size: 38px; }
+  .stage-lead { font-size: 16px; }
+  .scene { height: 420px; margin: 0 -16px; --ry: -6deg; --rx: 6deg; }
+  .beats { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .pass-lane { grid-template-columns: auto 140px auto; }
+  .pass-baton { offset-path: path("M17 1 Q 70 -30 123 1"); }
+}
+
+/* ============================================================ reduced motion, everywhere */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; transition-delay: 0s !important; }
+  .float { animation: none !important; }
+}

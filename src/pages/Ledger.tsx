@@ -4,6 +4,7 @@ import type { ClaimStatus, ClaimType } from '../types';
 import ClaimCard from '../components/ClaimCard';
 import { Empty, EvidenceList } from '../ui';
 import { STATUS_META, TYPE_LABEL } from '../meta';
+import { Explain } from '../motion';
 import { fmtDate } from '../lib/text';
 
 export default function Ledger({ go }: { go: (p: string) => void }) {
@@ -44,11 +45,10 @@ export default function Ledger({ go }: { go: (p: string) => void }) {
             <button className={view === 'timeline' ? 'on' : ''} onClick={() => setView('timeline')}>Decision timeline</button>
           </div>
         </div>
-        <p className="muted">
-          The extractor <i>proposes</i> atomic claims (decision, owner, status, risk, dependency, next action, recurring issue, contact),
+        <p className="lede">Every claim, with the quotes that prove it. Click a quote to see it in its source.</p>
+        <Explain><p>The extractor <i>proposes</i> atomic claims (decision, owner, status, risk, dependency, next action, recurring issue, contact),
           each with a quote. The verifier then checks every quote word-for-word against the stored source text, groups duplicates across
-          sources (corroboration) and compares claims on the same topic for contradictions. Click any quote to see it in its source.
-        </p>
+          sources (corroboration) and compares claims on the same topic for contradictions. Click any quote to see it in its source.</p></Explain>
         {view === 'claims' && (
           <div className="filters">
             <select value={ws} onChange={(e) => setWs(e.target.value)}>

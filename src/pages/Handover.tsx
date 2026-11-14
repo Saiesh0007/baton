@@ -8,6 +8,8 @@ import { fmtDate, hash, terms, uid } from '../lib/text';
 
 const DATE_RE = /\b(\d{1,2}\s+[A-Z][a-z]{2,8}\.?\s+\d{4}|\d{4}-\d{2}-\d{2}|before (I leave|the fest)|deadline|expires?)\b/i;
 
+const listOf = (xs: string[]) => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`);
+
 interface View {
   snap: PublishedSnapshot;
   visible: Claim[];
@@ -159,7 +161,7 @@ export default function Handover({ go }: { go: (p: string) => void }) {
 
   return (
     <div className="stack handover">
-      {!isSucc && <div className="alert info">Preview: this is exactly what <b>{ppl.successor}</b> sees. Leads-only content is already removed. Switch the role to <b>Successor</b> to acknowledge items.</div>}
+      {!isSucc && <div className="alert info">Preview of <b>{ppl.successor}</b>'s view, with leads-only content removed. Switch to <b>Successor</b> to acknowledge items.</div>}
       <div className="card hhead">
         <div>
           <div className="kicker">Step 5 · Handover for {ppl.successor}</div>
@@ -205,17 +207,27 @@ export default function Handover({ go }: { go: (p: string) => void }) {
             return (
               <section key={w.id} className="card ws">
                 <h3>{w.name}</h3>
-                {FIELDS.map((f) => {
-                  const fc = cs.filter((c) => f.types.includes(c.type));
-                  const cell = snap.fields.find((x) => x.workstream === w.id && x.field === f.key);
+                {FIELDS.filter((f) => cs.some((c) => f.types.includes(c.type))).map((f) => (
+                  <div key={f.key} className="field">
+                    <div className="flabel">{f.label}</div>
+                    <ul className="hlist">{cs.filter((c) => f.types.includes(c.type)).map((c) => itemRow(c))}</ul>
+                  </div>
+                ))}
+                {(() => {
+                  // every empty field of this workstream, said once instead of once per field
+                  const gaps = FIELDS.filter((f) => !cs.some((c) => f.types.includes(c.type)));
+                  if (!gaps.length) return null;
+                  const unknown = gaps.filter((f) => snap.fields.find((x) => x.workstream === w.id && x.field === f.key)?.state === 'dontknow');
                   return (
-                    <div key={f.key} className="field">
-                      <div className="flabel">{f.label}</div>
-                      {fc.length ? <ul className="hlist">{fc.map((c) => itemRow(c))}</ul>
-                        : <div className="gap-line">{cell?.state === 'dontknow' ? `Unknown: ${ppl.leaver} said "don't know".` : 'No approved evidence.'} Ask {ppl.reviewer}.</div>}
+                    <div className="field">
+                      <div className="flabel">Gaps</div>
+                      <div className="gap-line">
+                        No approved evidence for {listOf(gaps.map((f) => f.label.toLowerCase()))}
+                        {unknown.length ? ` (${ppl.leaver} didn't know ${listOf(unknown.map((f) => f.label.toLowerCase()))})` : ''}. Ask {ppl.reviewer}.
+                      </div>
                     </div>
                   );
-                })}
+                })()}
                 {sh.map((s) => (
                   <div key={s.id} className="shadow"><Lock /> A <b>{TYPE_LABEL[s.type].toLowerCase()}</b> about {w.name} exists in a restricted source. <b>Ask: {ppl.reviewer}</b></div>
                 ))}
@@ -233,9 +245,9 @@ export default function Handover({ go }: { go: (p: string) => void }) {
                   <div className="row gap">
                     {isSucc ? <input type="checkbox" checked={project.acks[p.id]?.state === 'read'} onChange={(e) => e.target.checked ? ack(p.id, 'read') : update((x) => { const acks = { ...x.acks }; delete acks[p.id]; return { ...x, acks }; })} aria-label="done" /> : null}
                     <span className={`pk pk-${p.kind.toLowerCase()}`}>{p.kind}</span>
-                    <span>{p.text}</span>
+                    <span>{p.text}{isSucc && project.acks[p.id]?.state !== 'read' && noteFor !== p.id && <button className="link unclear" onClick={() => { setNoteFor(p.id); setNote(''); }}>Unclear?</button>}</span>
                   </div>
-                  {isSucc && project.acks[p.id]?.state !== 'read' && (noteFor === p.id ? noteBox(p.id) : <button className="link small" onClick={() => { setNoteFor(p.id); setNote(''); }}>unclear?</button>)}
+                  {isSucc && noteFor === p.id && noteBox(p.id)}
                 </li>
               ))}
             </ul>

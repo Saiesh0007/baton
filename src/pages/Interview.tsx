@@ -5,6 +5,7 @@ import { FIELDS } from '../types';
 import ClaimCard from '../components/ClaimCard';
 import type { Analysis } from '../lib/analyze';
 import { Empty } from '../ui';
+import { Explain } from '../motion';
 
 export default function Interview({ go }: { go: (p: string) => void }) {
   const { project, analysis, update, role } = useStore();
@@ -30,11 +31,10 @@ export default function Interview({ go }: { go: (p: string) => void }) {
       <div className="card">
         <div className="kicker">Step 3½ · Ask the leaver</div>
         <h2>Gap-driven exit interview</h2>
-        <p className="muted">
-          These are the only questions <b>{project.people.leaver}</b> needs to answer. Each one comes from a conflict, a missing
+        <p className="lede">Only what the evidence can't answer, for <b>{project.people.leaver}</b>.</p>
+        <Explain><p>These are the only questions <b>{project.people.leaver}</b> needs to answer. Each one comes from a conflict, a missing
           template field or an inferred claim. Everything else is already covered by evidence. Answers are stored as a new labelled
-          source (<i>Leaver-attested</i>). “I don't know” is a valid answer and stays visible as an honest gap.
-        </p>
+          source (<i>Leaver-attested</i>). “I don't know” is a valid answer and stays visible as an honest gap.</p></Explain>
         <div className="progress"><div style={{ width: `${qs.length ? (answered / qs.length) * 100 : 100}%` }} /></div>
         <div className="row between wrap">
           <span className="muted small">{answered} of {qs.length} answered · readiness now {a.readiness}%</span>

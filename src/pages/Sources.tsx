@@ -4,6 +4,7 @@ import type { Chunk, Source, Visibility } from '../types';
 import { fetchGithub, ingestFile, parseChat, parseGithub, parseNotes, parseTasks, type Ingested } from '../lib/ingest';
 import { SAMPLE_FILES } from '../lib/demo';
 import { download } from '../meta';
+import { Explain } from '../motion';
 import { fmtDate } from '../lib/text';
 
 const KIND_LABEL: Record<Source['kind'], string> = { notes: 'Notes / docs', chat: 'Chat export', github: 'GitHub', tasks: 'Task records', interview: 'Exit interview' };
@@ -84,11 +85,10 @@ export default function Sources({ go }: { go: (p: string) => void }) {
           </div>
           {project.sources.length > 0 && <button className="btn primary" onClick={() => go('ledger')}>See claim ledger →</button>}
         </div>
-        <p className="muted">
-          Everything is normalised into events (who, when, text, link). API keys, tokens, emails and phone numbers are masked <b>before</b>{' '}
+        <p className="lede">Notes, chats, GitHub and tasks in. Secrets are masked before anything is stored.</p>
+        <Explain><p>Everything is normalised into events (who, when, text, link). API keys, tokens, emails and phone numbers are masked <b>before</b>{' '}
           anything is stored or analysed. Each source has a visibility: <b>Team</b> (the successor can see it) or <b>Leads only</b>{' '}
-          (the successor sees a “knowledge shadow” instead of the content).
-        </p>
+          (the successor sees a “knowledge shadow” instead of the content).</p></Explain>
 
         <div className="tabs">
           <button className={tab === 'github' ? 'on' : ''} onClick={() => setTab('github')}>GitHub repo</button>

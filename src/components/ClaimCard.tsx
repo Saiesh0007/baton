@@ -5,8 +5,8 @@ import { EvidenceList, ReviewPill, Tick, TypeTag } from '../ui';
 import { STATUS_META } from '../meta';
 import { fmtDate } from '../lib/text';
 
-export default function ClaimCard({ c, a, wsName, children, compact, noConflicts }: {
-  c: Claim; a: Analysis; wsName?: string; children?: ReactNode; compact?: boolean; noConflicts?: boolean;
+export default function ClaimCard({ c, a, wsName, children, compact, noConflicts, fresh }: {
+  c: Claim; a: Analysis; wsName?: string; children?: ReactNode; compact?: boolean; noConflicts?: boolean; fresh?: boolean;
 }) {
   const conflicts = c.conflictWith.map((id) => a.claims.find((x) => x.id === id)).filter(Boolean) as Claim[];
   return (
@@ -18,7 +18,7 @@ export default function ClaimCard({ c, a, wsName, children, compact, noConflicts
           <TypeTag t={c.type} />
           {wsName && <span className="muted">{wsName}</span>}
           {c.edited && <span className="stl stl-edited" title="Statement edited by reviewer; previous versions are kept">Edited</span>}
-          <ReviewPill c={c} />
+          <ReviewPill c={c} fresh={fresh} />
           <span className="spacer" />
           {c.date && <span className="mono muted">{fmtDate(c.date)}</span>}
         </header>
