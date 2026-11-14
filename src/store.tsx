@@ -12,7 +12,8 @@ function load(): Persisted {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const p = JSON.parse(raw) as Persisted;
-      if (Array.isArray(p.projects)) return p;
+      // keep the work, but every fresh load starts on the landing page, not inside the last handover
+      if (Array.isArray(p.projects)) return { ...p, currentId: null };
     }
   } catch { /* storage unavailable */ }
   return { projects: [buildDemoProject()], currentId: null, role: 'reviewer' };
