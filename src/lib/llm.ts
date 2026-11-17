@@ -242,7 +242,8 @@ export async function proposeAll(
     try {
       const res = await send(batch, ws);
       const part: Record<string, LlmClaim[]> = {};
-      for (const c of batch) part[c.key ?? textKey(c.text)] = res[c.id] ?? [];
+      // an id the server did not return was not read (e.g. not saved yet): leave it pending
+      for (const c of batch) if (c.id in res) part[c.key ?? textKey(c.text)] = res[c.id];
       Object.assign(cache, part);
       opts.onBatch?.(part);
       done += batch.length;

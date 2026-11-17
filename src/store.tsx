@@ -209,6 +209,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const runLlm = () => {
     if (!project?.llm?.enabled || abort.current || role === 'successor') return; // one run at a time
+    if (isCloud && save.state !== 'saved') return; // the server reads saved text; the run starts once saved
     const p = project;
     const todo = pendingChunks(p.chunks, p.sources, p.llm!.cache, isBot).map(toChunkIn);
     patch(p.id, (x) => ({ ...x, llm: { ...x.llm!, lastError: undefined } }));
@@ -235,10 +236,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   // Auto-run when team text is waiting (after an import, a re-sync, or opening the demo).
   // Stops after an error until the user presses retry, so a broken service never loops.
+  // In a shared handover the server reads the text from the database, so wait until it is saved.
+  const savedForLlm = !isCloud || save.state === 'saved';
   useEffect(() => {
-    if (project?.llm?.enabled && llmPending > 0 && !project.llm.lastError && !abort.current) runLlm();
+    if (project?.llm?.enabled && llmPending > 0 && !project.llm.lastError && !abort.current && savedForLlm) runLlm();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [project?.id, llmPending, project?.llm?.enabled, project?.llm?.lastError]);
+  }, [project?.id, llmPending, project?.llm?.enabled, project?.llm?.lastError, savedForLlm]);
 
   const store: Store = {
     projects: state.projects,
