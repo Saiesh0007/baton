@@ -3,7 +3,7 @@ import { useStore } from '../store';
 import type { Source } from '../types';
 import { fetchGithub, ingestFile, parseChat, parseGithub, parseNotes, parseTasks, type Ingested } from '../lib/ingest';
 import { applyResync, githubRepoOf, type ResyncSummary } from '../lib/resync';
-import { DEMO_NOTES_UPDATE } from '../lib/demo';
+import { DEMO_NOTES_NAME, DEMO_NOTES_UPDATE } from '../lib/demo';
 import { DiffText } from './DiffText';
 import { fmtDate } from '../lib/text';
 
@@ -19,7 +19,8 @@ export default function ResyncPanel({ s, close, go }: { s: Source; close: () => 
   const [result, setResult] = useState<ResyncSummary | null>(null);
   if (!project) return null;
   const repo = githubRepoOf(s);
-  const demoNotes = project.isDemo && s.kind === 'notes';
+  // the demo's notes, also in a shared copy of the demo (what judges use)
+  const demoNotes = s.kind === 'notes' && s.name === DEMO_NOTES_NAME;
   const canPaste = s.kind === 'notes' || s.kind === 'chat' || s.kind === 'tasks';
 
   const apply = (fresh: Ingested) => {

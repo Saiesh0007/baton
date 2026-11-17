@@ -41,6 +41,8 @@ export const DEMO_NOTES = `# Spark Fest Tech Team — Meeting notes
  * Round 3 re-sync demo: the same meeting notes a few weeks later. One decision edited (Netlify -> Vercel),
  * one date edited (SMS key expiry), one task removed (backups done), one new section added.
  */
+export const DEMO_NOTES_NAME = 'Core meeting notes (Markdown)';
+
 export const DEMO_NOTES_UPDATE = DEMO_NOTES
   .replace('We decided to host the fest website on Netlify instead of the college server, because the college server went down twice last year.',
     'We decided to host the fest website on Vercel instead of Netlify, because the Netlify build minutes ran out in October.')
@@ -111,7 +113,7 @@ Move registration DB backups to team drive,Not started,Aarav,2026-11-15
 `;
 
 export function buildDemoProject(): Project {
-  const notes = parseNotes('Core meeting notes (Markdown)', DEMO_NOTES, 'team');
+  const notes = parseNotes(DEMO_NOTES_NAME, DEMO_NOTES, 'team');
   const core = parseChat('Discord #core', DEMO_CHAT_CORE, 'team');
   const leads = parseChat('Discord #leads-only', DEMO_CHAT_LEADS, 'leads');
   const gh = parseGithub(DEMO_GITHUB, 'team');
