@@ -4,7 +4,7 @@ import { uid } from './text';
 
 export interface Ingested { source: Source; chunks: Chunk[] }
 
-interface RawChunk { author?: string; ts?: string; text: string; ref: string; url?: string; task?: TaskMeta }
+interface RawChunk { author?: string; ts?: string; text: string; ref: string; url?: string; task?: TaskMeta; key?: string }
 
 function build(name: string, kind: SourceKind, visibility: Visibility, raws: RawChunk[], extra: Partial<Source> = {}): Ingested {
   const id = uid('src');
@@ -16,7 +16,7 @@ function build(name: string, kind: SourceKind, visibility: Visibility, raws: Raw
     const task = r.task
       ? { ...r.task, title: redact(r.task.title, tally), assignee: r.task.assignee }
       : undefined;
-    chunks.push({ id: `${id}-${i}`, sourceId: id, author: r.author?.trim() || undefined, ts: r.ts, text, ref: r.ref, url: r.url, task });
+    chunks.push({ id: `${id}-${i}`, sourceId: id, author: r.author?.trim() || undefined, ts: r.ts, text, ref: r.ref, url: r.url, task, key: r.key });
   });
   const source: Source = {
     id, name, kind, visibility, importedAt: new Date().toISOString(), redactions: tallyToList(tally), ...extra,
@@ -76,7 +76,8 @@ export function parseChat(name: string, data: unknown, visibility: Visibility): 
       m.author?.nickname || m.author?.name || m.user_profile?.real_name || m.user_profile?.display_name ||
       m.user_name || m.username || (typeof m.author === 'string' ? m.author : undefined) || m.user || 'unknown';
     const text = String(m.content ?? m.text ?? m.message ?? '');
-    return { author, ts: toIso(m.timestamp ?? m.ts ?? m.date ?? m.time), text, ref: `msg #${i + 1}` };
+    const mid = m.id ?? m.client_msg_id ?? m.ts;
+    return { author, ts: toIso(m.timestamp ?? m.ts ?? m.date ?? m.time), text, ref: `msg #${i + 1}`, key: mid !== undefined && mid !== null && mid !== '' ? `msg:${mid}` : undefined };
   });
   const channel = d?.channel?.name ? `#${d.channel.name}` : undefined;
   return build(name || channel || 'Chat export', 'chat', visibility, raws);
@@ -115,7 +116,7 @@ export function parseTasks(name: string, csv: string, visibility: Visibility): I
     const c = splitCsvLine(l);
     const task: TaskMeta = { title: c[iTitle] ?? '', status: c[iStatus] ?? '', assignee: iAssignee >= 0 ? c[iAssignee] || undefined : undefined, due: iDue >= 0 ? c[iDue] || undefined : undefined };
     const text = `${task.title} — status: ${task.status}` + (task.assignee ? ` — assignee: ${task.assignee}` : '') + (task.due ? ` — due: ${task.due}` : '');
-    return { text, ref: `row ${i + 2}`, task, ts: task.due ? toIso(task.due) : undefined, author: undefined };
+    return { text, ref: `row ${i + 2}`, task, ts: task.due ? toIso(task.due) : undefined, author: undefined, key: task.title ? `task:${task.title.toLowerCase()}` : undefined };
   });
   return build(name, 'tasks', visibility, raws);
 }
@@ -133,14 +134,14 @@ export function parseGithub(gh: GithubExport, visibility: Visibility): Ingested 
   const base = gh.synthetic ? undefined : `https://github.com/${gh.repo}`;
   const raws: RawChunk[] = [];
   for (const c of gh.commits ?? []) {
-    raws.push({ author: c.author, ts: toIso(c.date), text: c.message.split('\n').slice(0, 6).join('\n').slice(0, 600), ref: `commit ${c.sha.slice(0, 7)}`, url: base && `${base}/commit/${c.sha}` });
+    raws.push({ author: c.author, ts: toIso(c.date), text: c.message.split('\n').slice(0, 6).join('\n').slice(0, 600), ref: `commit ${c.sha.slice(0, 7)}`, url: base && `${base}/commit/${c.sha}`, key: `commit:${c.sha}` });
   }
   for (const p of gh.pulls ?? []) {
     const st = p.merged ? 'merged' : p.state;
-    raws.push({ author: p.author, ts: toIso(p.date), text: `${p.title}${p.body ? '\n' + p.body.slice(0, 800) : ''}`, ref: `PR #${p.number} (${st})`, url: base && `${base}/pull/${p.number}` });
+    raws.push({ author: p.author, ts: toIso(p.date), text: `${p.title}${p.body ? '\n' + p.body.slice(0, 800) : ''}`, ref: `PR #${p.number} (${st})`, url: base && `${base}/pull/${p.number}`, key: `pr:${p.number}` });
   }
   for (const s of gh.issues ?? []) {
-    raws.push({ author: s.author, ts: toIso(s.date), text: `${s.title}${s.body ? '\n' + s.body.slice(0, 800) : ''}`, ref: `issue #${s.number} (${s.state})`, url: base && `${base}/issues/${s.number}` });
+    raws.push({ author: s.author, ts: toIso(s.date), text: `${s.title}${s.body ? '\n' + s.body.slice(0, 800) : ''}`, ref: `issue #${s.number} (${s.state})`, url: base && `${base}/issues/${s.number}`, key: `issue:${s.number}` });
   }
   if (gh.readme) {
     gh.readme.split(/\r?\n/).forEach((l, i) => {

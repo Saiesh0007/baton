@@ -1,8 +1,9 @@
 import type {
-  Chunk, Claim, ClaimStatus, ClaimType, FieldCell, FieldKey, Project, Question, Source, Workstream,
+  ApprovalBasis, Chunk, Claim, ReviewRecord, ClaimStatus, ClaimType, FieldCell, FieldKey, Project, Question, Source, Workstream,
 } from '../types';
 import { FIELDS } from '../types';
 import { hash, norm, splitSentences, terms, escapeRe } from './text';
+import { textKey, type LlmState } from './llm';
 
 /* ------------------------------------------------------------------ */
 /* 1. Proposer: rules-based claim extraction (swappable for an LLM).   */
@@ -118,6 +119,33 @@ export function extractClaims(chunks: Chunk[], ws: Workstream[], names: string[]
   return out;
 }
 
+/** Claims from cached LLM proposals; chunks the LLM has not seen (or may not see) fall back to the rules. */
+export function proposeClaims(chunks: Chunk[], ws: Workstream[], names: string[], llm?: LlmState, restricted: Set<string> = new Set()): Claim[] {
+  if (!llm?.enabled) return extractClaims(chunks, ws, names).map((c) => ({ ...c, proposer: 'rules' }));
+  const wsIds = new Set(ws.map((w) => w.id));
+  const rest: Chunk[] = [];
+  const out: Claim[] = [];
+  for (const ch of chunks) {
+    // leads-only text is never sent to the LLM, so it always uses the rules proposer
+    const cached = ch.task || restricted.has(ch.sourceId) ? undefined : llm.cache[textKey(ch.text)];
+    if (!cached) { rest.push(ch); continue; }
+    for (const l of cached) {
+      out.push(blankClaim({
+        id: 'l-' + hash(ch.id + '|' + l.type + '|' + norm(l.quote)),
+        workstream: wsIds.has(l.workstream) ? l.workstream : assignWorkstream(l.quote, ch.text, ws),
+        type: l.type,
+        statement: cap(l.statement),
+        evidence: [{ chunkId: ch.id, quote: l.quote, verified: false }],
+        people: findPeople(l.statement + ' ' + l.quote, names),
+        date: ch.ts,
+        proposer: 'llm',
+        llmModel: l.model,
+      }));
+    }
+  }
+  return [...out, ...extractClaims(rest, ws, names).map((c) => ({ ...c, proposer: 'rules' as const }))];
+}
+
 /* ------------------------------------------------------------------ */
 /* 2. Verifier: deterministic, never trusts the proposer.             */
 /* ------------------------------------------------------------------ */
@@ -157,10 +185,12 @@ function mergeDuplicates(claims: Claim[]): Claim[] {
 }
 
 /** Contradiction detection: decision/status claims on the same topic with opposite polarity. */
-function detectConflicts(claims: Claim[], ws: Workstream[]) {
+function detectConflicts(claims: Claim[], ws: Workstream[], chunkById: Map<string, Chunk>) {
+  const srcOf = (c: Claim) => chunkById.get(c.evidence[0]?.chunkId)?.sourceId;
   const topic = new Map(ws.map((w) => [w.id, new Set(terms([w.name, ...w.keywords].join(' ')))]));
   const byWs = new Map<string, Claim[]>();
-  for (const c of claims) if (c.type === 'decision' || c.type === 'status') {
+  // "half done, still broken" (an issue) can contradict "marked Done" (a status)
+  for (const c of claims) if (c.type === 'decision' || c.type === 'status' || (c.type === 'issue' && c.proposer === 'llm')) {
     (byWs.get(c.workstream) ?? byWs.set(c.workstream, []).get(c.workstream)!).push(c);
   }
   for (const [wsId, list] of byWs.entries()) {
@@ -170,12 +200,22 @@ function detectConflicts(claims: Claim[], ws: Workstream[]) {
     tl.forEach((ts) => ts.forEach((t) => df.set(t, (df.get(t) ?? 0) + 1)));
     for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) {
       const a = list[i], b = list[j];
-      if (pol(a) === pol(b)) continue;
+      // an issue (a problem by definition) only contradicts a status saying the thing is done or working:
+      // "half done, still broken" vs "marked Done"; never a fix, another issue, or "not started"
+      const issue = a.type === 'issue' ? a : b.type === 'issue' ? b : null;
+      if (issue) {
+        const other = issue === a ? b : a;
+        if (other.type !== 'status' || pol(other) < 0) continue;
+      } else if (pol(a) === pol(b)) continue;
       // two sentences of one message are one voice, not a contradiction
       if (a.evidence.some((e) => b.evidence.some((f) => f.chunkId === e.chunkId))) continue;
       const o = overlap(tl[i], tl[j]);
       const rare = o.shared.filter((t) => (df.get(t) ?? 0) <= 3 && t.length >= 5 && !generic.has(t));
-      if (rare.length >= 1 && o.ratio >= 0.2) {
+      // LLM statements are cleaner and longer: inside one source (one repo's history refining itself)
+      // a single shared word is weak evidence of a clash; across sources it is what matters at handover
+      const sameSource = srcOf(a) === srcOf(b);
+      const need = (a.proposer === 'llm' || b.proposer === 'llm') && sameSource ? 2 : 1;
+      if (rare.length >= need && o.ratio >= 0.2) {
         a.conflictWith.push(b.id);
         b.conflictWith.push(a.id);
       }
@@ -265,6 +305,8 @@ export interface Analysis {
   chunks: Chunk[];
   people: string[];
   stats: Record<ClaimStatus, number>;
+  /** proposals dropped because their quote was not found word for word in the source */
+  rejectedQuotes: { llm: number; rules: number };
 }
 
 export const INTERVIEW_SOURCE_ID = 'src-interview';
@@ -284,13 +326,15 @@ export function analyze(p: Project): Analysis {
   const baseChunks = p.chunks.filter((c) => sourceById.has(c.sourceId));
   const chunkById = new Map(baseChunks.map((c) => [c.id, c]));
 
-  // 1. propose
-  let claims = extractClaims(baseChunks, ws, names);
+  // 1. propose: LLM proposals where cached (team text only), rules for everything else
+  let claims = proposeClaims(baseChunks, ws, names, p.llm, new Set(p.sources.filter((s) => s.visibility === 'leads').map((s) => s.id)));
   // 2. verify each quote literally against its chunk
   claims.forEach((c) => c.evidence.forEach((e) => { e.verified = verifyQuote(e.quote, chunkById.get(e.chunkId)); }));
+  const unverified = claims.filter((c) => !c.evidence.some((e) => e.verified));
+  const rejectedQuotes = { llm: unverified.filter((c) => c.proposer === 'llm').length, rules: unverified.filter((c) => c.proposer !== 'llm').length };
   claims = claims.filter((c) => c.evidence.some((e) => e.verified)); // proposer misfires dropped
   claims = mergeDuplicates(claims);
-  detectConflicts(claims, ws);
+  detectConflicts(claims, ws, chunkById);
   claims.push(...inferOwners(claims, baseChunks, ws, p.sources, [p.people.successor]));
 
   // manual claims added by the reviewer: quote checked against all chunks
@@ -366,12 +410,30 @@ export function analyze(p: Project): Analysis {
   }
 
   // 5. reviewer decisions (versioned, never change evidence status)
+  const present = new Set<string>();
   for (const c of claims) {
     const r = p.reviews[c.id];
     if (!r) continue;
+    present.add(c.id);
     c.review = r.state;
     c.versions = r.versions;
     if (r.statement && r.statement !== c.statement) { c.statement = r.statement; c.edited = true; }
+    // an approval whose source text was edited since goes back to the queue (re-sync)
+    const drift = r.state === 'approved' ? basisDrift(r, chunkById) : undefined;
+    if (drift) { c.review = 'pending'; c.stale = drift; }
+  }
+  // approved claims whose quote vanished because the source changed: kept visible, flagged, never silently dropped
+  for (const [id, r] of Object.entries(p.reviews)) {
+    if (present.has(id) || r.state !== 'approved' || !r.snapshot || !r.basis?.length) continue;
+    const drift = basisDrift(r, chunkById);
+    if (!drift) continue; // source unchanged: the claim only left because the proposer changed
+    claims.push(blankClaim({
+      id, workstream: wsIds(ws).has(r.snapshot.workstream) ? r.snapshot.workstream : 'general', type: r.snapshot.type,
+      statement: r.statement ?? r.snapshot.statement, originalStatement: r.snapshot.statement, origin: 'extracted', status: 'inferred',
+      evidence: r.basis.map((b) => ({ chunkId: b.chunkId, quote: b.quote, verified: false })),
+      versions: r.versions, review: 'pending', stale: drift,
+      note: 'Approved earlier, but its quote is no longer in the source. If the source now says something new, it appears as a separate claim. Reject this one, or edit it to keep it on your word.',
+    }));
   }
 
   const fields = fieldCells(claims, ws);
@@ -383,11 +445,32 @@ export function analyze(p: Project): Analysis {
   const stats = { corroborated: 0, cited: 0, attested: 0, inferred: 0, conflicting: 0 } as Record<ClaimStatus, number>;
   claims.forEach((c) => { if (!c.superseded) stats[c.status]++; });
 
-  return { claims, questions, fields, readiness, chunkById, sourceById, sources, chunks: baseChunks, people: names, stats };
+  return { claims, questions, fields, readiness, chunkById, sourceById, sources, chunks: baseChunks, people: names, stats, rejectedQuotes };
+}
+
+const wsIds = (ws: Workstream[]) => new Set(ws.map((w) => w.id));
+
+/** Snapshot of the source text behind an approval (stored on the review record). */
+export function approvalBasis(c: Claim, chunkById: Map<string, Chunk>): ApprovalBasis[] {
+  return c.evidence.filter((e) => e.verified).map((e) => {
+    const ch = chunkById.get(e.chunkId);
+    return { chunkId: e.chunkId, textKey: ch ? textKey(ch.text) : '', text: ch?.text ?? '', quote: e.quote, ref: ch?.ref ?? '' };
+  });
+}
+
+/** Has the source text behind an approval changed? Returns why, with before/after for the reviewer. */
+function basisDrift(r: ReviewRecord, chunkById: Map<string, Chunk>): Claim['stale'] {
+  for (const b of r.basis ?? []) {
+    const ch = chunkById.get(b.chunkId);
+    if (!ch) return { reason: 'The source event this was approved from was deleted.', before: b.text, ref: b.ref };
+    if (textKey(ch.text) !== b.textKey) return { reason: 'The source text was edited after approval.', before: b.text, after: ch.text, ref: ch.ref };
+  }
+  return undefined;
 }
 
 /** Risk-first ordering used by the review queue. */
 export function riskRank(c: Claim): number {
+  if (c.stale) return -1; // approvals whose source changed come first
   const s = { conflicting: 0, inferred: 1, attested: 3, cited: 4, corroborated: 5 }[c.status];
   const t = c.type === 'risk' || c.type === 'issue' || c.type === 'dependency' ? -0.5 : 0;
   return s + t;

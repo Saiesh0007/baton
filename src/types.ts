@@ -1,3 +1,5 @@
+import type { LlmState } from './lib/llm';
+
 export type SourceKind = 'notes' | 'chat' | 'github' | 'tasks' | 'interview';
 export type Visibility = 'team' | 'leads';
 
@@ -12,7 +14,11 @@ export interface Source {
   importedAt: string;
   redactions: Redaction[];
   synthetic?: boolean;
+  /** Round 3 re-sync: when the source was last re-imported, and what changed */
+  syncs?: SyncRecord[];
 }
+
+export interface SyncRecord { ts: string; by: string; added: number; changed: number; removed: number; unchanged: number; flagged: number }
 
 export interface TaskMeta { title: string; status: string; assignee?: string; due?: string }
 
@@ -24,6 +30,8 @@ export interface Chunk {
   ts?: string; // ISO date
   text: string;
   ref: string; // human locator: "line 12", "msg #4", "PR #48"
+  /** stable identity across re-imports (commit sha, PR number, message id, task title); absent for plain text lines */
+  key?: string;
   url?: string;
   task?: TaskMeta;
 }
@@ -43,6 +51,10 @@ export interface Claim {
   people: string[];
   evidence: Evidence[];
   origin: 'extracted' | 'inferred' | 'interview' | 'manual';
+  /** which proposer suggested an extracted claim */
+  proposer?: 'llm' | 'rules';
+  /** which LLM proposed it (the fallback model is used only when the main one's daily quota is out) */
+  llmModel?: string;
   status: ClaimStatus;
   conflictWith: string[];
   superseded?: string; // id of attested claim that replaced it
@@ -52,6 +64,8 @@ export interface Claim {
   edited: boolean;
   versions: Version[];
   note?: string;
+  /** Round 3: set when an approval's source text changed since it was approved */
+  stale?: { reason: string; before?: string; after?: string; ref?: string };
 }
 
 export interface Version { statement: string; by: string; ts: string; action: string }
@@ -88,7 +102,14 @@ export interface Answer {
   ts: string;
 }
 
-export interface ReviewRecord { state: ReviewState; statement?: string; versions: Version[] }
+export interface ReviewRecord {
+  state: ReviewState; statement?: string; versions: Version[];
+  /** Round 3: the exact source text an approval was based on, to detect later edits/deletions */
+  basis?: ApprovalBasis[];
+  snapshot?: { statement: string; type: ClaimType; workstream: string };
+}
+
+export interface ApprovalBasis { chunkId: string; textKey: string; text: string; quote: string; ref: string }
 
 export interface ManualClaim {
   id: string; workstream: string; type: ClaimType; statement: string; quote?: string; ts: string;
@@ -124,9 +145,13 @@ export interface Project {
   reviews: Record<string, ReviewRecord>;
   manualClaims: ManualClaim[];
   published?: PublishedSnapshot;
+  /** Round 3: earlier published versions, oldest first (the latest is also `published`) */
+  history?: PublishedSnapshot[];
   acks: Record<string, Ack>;
   successorQuestions: SuccessorQuestion[];
   audit: AuditEntry[];
+  /** Round 3: LLM proposer settings and cached proposals */
+  llm?: LlmState;
   isDemo?: boolean;
   createdAt: string;
 }

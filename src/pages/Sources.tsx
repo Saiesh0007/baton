@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useStore } from '../store';
 import type { Chunk, Source, Visibility } from '../types';
 import { fetchGithub, ingestFile, parseChat, parseGithub, parseNotes, parseTasks, type Ingested } from '../lib/ingest';
@@ -7,6 +7,9 @@ import { download } from '../meta';
 import { BandStat } from '../ui';
 import { Explain } from '../motion';
 import { fmtDate } from '../lib/text';
+import { newLlmState, type LlmClaim } from '../lib/llm';
+import ProposerPanel from '../components/ProposerPanel';
+import ResyncPanel from '../components/ResyncPanel';
 
 const SNAPSHOT_DATE = '14 Nov 2026';
 const SNAPSHOTS = [
@@ -28,13 +31,17 @@ export default function Sources({ go }: { go: (p: string) => void }) {
   const [err, setErr] = useState('');
   const [paste, setPaste] = useState({ name: '', kind: 'notes' as 'notes' | 'chat' | 'tasks', text: '' });
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [resyncing, setResyncing] = useState<string | null>(null);
   if (!project || !analysis) return null;
 
-  const add = (items: Ingested[]) => {
+  const add = (items: Ingested[], llmCache?: Record<string, LlmClaim[]>) => {
     const total = items.reduce((n, i) => n + i.chunks.length, 0);
     const red = items.reduce((n, i) => n + i.source.redactions.reduce((m, r) => m + r.count, 0), 0);
     update(
-      (p) => ({ ...p, sources: [...p.sources, ...items.map((i) => i.source)], chunks: [...p.chunks, ...items.flatMap((i) => i.chunks)] }),
+      (p) => ({
+        ...p, sources: [...p.sources, ...items.map((i) => i.source)], chunks: [...p.chunks, ...items.flatMap((i) => i.chunks)],
+        llm: llmCache ? { ...(p.llm ?? { ...newLlmState(), enabled: false }), cache: { ...llmCache, ...(p.llm?.cache ?? {}) } } : p.llm,
+      }),
       `Imported ${items.map((i) => i.source.name).join(', ')} (${total} events, ${red} values masked)`,
     );
     setErr('');
@@ -48,7 +55,9 @@ export default function Sources({ go }: { go: (p: string) => void }) {
       if (!r.ok) throw new Error('Snapshot not found.');
       const item = parseGithub(await r.json(), vis);
       item.source.name += ` (snapshot ${SNAPSHOT_DATE})`;
-      add([item]);
+      // the LLM proposals evaluated in scripts/eval-llm.ts for this snapshot: instant, no rate limit
+      const saved = await fetch(`/real/llm/${key}.json`).then((x) => (x.ok ? x.json() : null)).catch(() => null) as { cache?: Record<string, LlmClaim[]> } | null;
+      add([item], saved?.cache);
     } catch (e) { setErr((e as Error).message); }
     setBusy('');
   };
@@ -185,6 +194,7 @@ export default function Sources({ go }: { go: (p: string) => void }) {
 
       <div className="card">
         <h3>Connected sources ({project.sources.length})</h3>
+        {project.sources.length > 0 && <ProposerPanel />}
         {!project.sources.length && <p className="muted">No sources yet. Import a GitHub repo or upload files above.</p>}
         <div className="tbl-wrap">
           <table className="tbl">
@@ -194,7 +204,9 @@ export default function Sources({ go }: { go: (p: string) => void }) {
                 const ev = project.chunks.filter((c) => c.sourceId === s.id);
                 return (
                   <SourceRow key={s.id} s={s} ev={ev} claims={claimCount(s.id)} expanded={expanded === s.id}
-                    toggle={() => setExpanded(expanded === s.id ? null : s.id)} setVisibility={setVisibility} remove={remove} />
+                    toggle={() => setExpanded(expanded === s.id ? null : s.id)} setVisibility={setVisibility} remove={remove}
+                    resync={resyncing === s.id ? <ResyncPanel s={s} close={() => setResyncing(null)} go={go} /> : null}
+                    openResync={() => setResyncing(resyncing === s.id ? null : s.id)} />
                 );
               })}
             </tbody>
@@ -205,15 +217,18 @@ export default function Sources({ go }: { go: (p: string) => void }) {
   );
 }
 
-function SourceRow({ s, ev, claims, expanded, toggle, setVisibility, remove }: {
+function SourceRow({ s, ev, claims, expanded, toggle, setVisibility, remove, resync, openResync }: {
   s: Source; ev: Chunk[]; claims: number; expanded: boolean; toggle: () => void;
   setVisibility: (id: string, v: Visibility) => void; remove: (id: string) => void;
+  resync: ReactNode; openResync: () => void;
 }) {
+  const last = s.syncs?.[s.syncs.length - 1];
   const red = s.redactions.reduce((n, r) => n + r.count, 0);
   return (
     <>
       <tr>
-        <td><button className="link" onClick={toggle}>{expanded ? '▾' : '▸'} {s.name}</button>{s.synthetic && <span className="pill p-grey" style={{ marginLeft: 6 }}>synthetic</span>}</td>
+        <td><button className="link" onClick={toggle}>{expanded ? '▾' : '▸'} {s.name}</button>{s.synthetic && <span className="pill p-grey" style={{ marginLeft: 6 }}>synthetic</span>}
+          {last && <div className="muted small">re-synced {fmtDate(last.ts)}{last.flagged ? ` · ${last.flagged} sent to re-review` : ''}</div>}</td>
         <td>{KIND_LABEL[s.kind]}</td>
         <td>{ev.length}</td>
         <td>{claims}</td>
@@ -224,8 +239,9 @@ function SourceRow({ s, ev, claims, expanded, toggle, setVisibility, remove }: {
             <option value="leads">Leads only</option>
           </select>
         </td>
-        <td><button className="btn ghost sm" onClick={() => remove(s.id)}>Remove</button></td>
+        <td className="nowrap"><button className="btn sm" onClick={openResync} aria-expanded={!!resync}>Re-sync</button> <button className="btn ghost sm" onClick={() => remove(s.id)}>Remove</button></td>
       </tr>
+      {resync && <tr className="sub"><td colSpan={7}>{resync}</td></tr>}
       {expanded && (
         <tr className="sub">
           <td colSpan={7}>

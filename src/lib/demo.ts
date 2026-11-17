@@ -1,4 +1,7 @@
 import type { Project } from '../types';
+import { newLlmState, type LlmState } from './llm';
+// LLM proposals for the demo's team-visible text, made ahead of time by `npx tsx scripts/eval-llm.ts demo`
+import demoLlm from './demo-llm.json';
 import { parseChat, parseGithub, parseNotes, parseTasks, type GithubExport } from './ingest';
 
 /**
@@ -32,6 +35,21 @@ export const DEMO_NOTES = `# Spark Fest Tech Team — Meeting notes
 - Kabir is responsible for the certificate generator.
 - We agreed that certificates will be emailed as PDFs, not printed, to cut cost.
 - TODO: move the registration database backups from Aarav's personal Google Drive to the team drive.
+`;
+
+/**
+ * Round 3 re-sync demo: the same meeting notes a few weeks later. One decision edited (Netlify -> Vercel),
+ * one date edited (SMS key expiry), one task removed (backups done), one new section added.
+ */
+export const DEMO_NOTES_UPDATE = DEMO_NOTES
+  .replace('We decided to host the fest website on Netlify instead of the college server, because the college server went down twice last year.',
+    'We decided to host the fest website on Vercel instead of Netlify, because the Netlify build minutes ran out in October.')
+  .replace('expires on 31 Mar 2027', 'expires on 31 Jan 2027')
+  .replace("- TODO: move the registration database backups from Aarav's personal Google Drive to the team drive.\n", '')
+  + `
+## 21 Oct 2026
+- Registration database backups now run nightly to the team drive.
+- Isha will own the sponsorship portal from November.
 `;
 
 export const DEMO_CHAT_CORE = {
@@ -103,6 +121,7 @@ export function buildDemoProject(): Project {
   return {
     id: 'demo',
     isDemo: true,
+    llm: { ...newLlmState(), cache: demoLlm.cache as LlmState['cache'], prebuilt: true },
     name: 'Spark Fest tech team — Aarav → Diya',
     description: 'Fictional college tech team. Aarav (final year) is graduating and hands the registration app, website and certificates over to Diya (second year). Prof. Joshi reviews.',
     people: { leaver: 'Aarav', successor: 'Diya', reviewer: 'Prof. Joshi' },

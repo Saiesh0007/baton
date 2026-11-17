@@ -4,6 +4,8 @@ import type { Analysis } from '../lib/analyze';
 import { EvidenceList, ReviewPill, Tick, TypeTag } from '../ui';
 import { STATUS_META } from '../meta';
 import { fmtDate } from '../lib/text';
+import { DiffText } from './DiffText';
+import { LLM_MODEL } from '../lib/llm';
 
 export default function ClaimCard({ c, a, wsName, children, compact, noConflicts, fresh }: {
   c: Claim; a: Analysis; wsName?: string; children?: ReactNode; compact?: boolean; noConflicts?: boolean; fresh?: boolean;
@@ -16,6 +18,7 @@ export default function ClaimCard({ c, a, wsName, children, compact, noConflicts
         <header className="claim-meta">
           <span className={`stl stl-${c.status}`} title={STATUS_META[c.status].help}>{STATUS_META[c.status].label}</span>
           <TypeTag t={c.type} />
+          {c.proposer && <span className={`stl stl-${c.proposer}`} title={c.proposer === 'llm' ? `Proposed by ${c.llmModel?.replace(/^.*\//, '') ?? 'the LLM'}; quote verified word for word` : 'Proposed by the rules; quote verified word for word'}>{c.proposer === 'llm' ? (c.llmModel && c.llmModel !== LLM_MODEL ? 'LLM·small' : 'LLM') : 'rules'}</span>}
           {wsName && <span className="muted">{wsName}</span>}
           {c.edited && <span className="stl stl-edited" title="Statement edited by reviewer; previous versions are kept">Edited</span>}
           <ReviewPill c={c} fresh={fresh} />
@@ -23,8 +26,18 @@ export default function ClaimCard({ c, a, wsName, children, compact, noConflicts
           {c.date && <span className="mono muted">{fmtDate(c.date)}</span>}
         </header>
         <p className="claim-text">{c.statement}</p>
+        {c.stale && (
+          <div className="stale-box" role="note">
+            <div className="stale-head">Needs re-review · {c.stale.reason}</div>
+            {c.stale.before !== undefined && (
+              <p className="stale-diff mono small">{c.stale.ref && <span className="muted">{c.stale.ref}: </span>}
+                {c.stale.after !== undefined ? <DiffText before={c.stale.before} after={c.stale.after} /> : <del>{c.stale.before}</del>}
+              </p>
+            )}
+          </div>
+        )}
         {c.edited && <p className="muted small">Original: <s>{c.originalStatement}</s></p>}
-        {c.origin === 'interview' && c.note && <p className="muted small">{c.note}</p>}
+        {(c.origin === 'interview' || c.stale) && c.note && <p className="muted small">{c.note}</p>}
         {!compact && <EvidenceList claim={c} chunkById={a.chunkById} sourceById={a.sourceById} />}
         {!compact && !noConflicts && conflicts.length > 0 && (
           <div className="conflict-box">

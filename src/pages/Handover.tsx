@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useStore } from '../store';
-import type { Claim, Chunk, PublishedSnapshot, Source } from '../types';
+import type { Claim } from '../types';
+import { buildView } from '../lib/view';
+import VersionDiffPanel from '../components/VersionDiffPanel';
 import { FIELDS } from '../types';
 import { BandStat, EvidenceList, StatusPill, TypeTag, Empty, Lock } from '../ui';
 import { download, TYPE_LABEL } from '../meta';
@@ -9,36 +11,6 @@ import { fmtDate, hash, terms, uid } from '../lib/text';
 const DATE_RE = /\b(\d{1,2}\s+[A-Z][a-z]{2,8}\.?\s+\d{4}|\d{4}-\d{2}-\d{2}|before (I leave|the fest)|deadline|expires?)\b/i;
 
 const listOf = (xs: string[]) => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`);
-
-interface View {
-  snap: PublishedSnapshot;
-  visible: Claim[];
-  shadows: Claim[];
-  chunkById: Map<string, Chunk>;
-  sourceById: Map<string, Source>;
-}
-
-/** Build the successor's view: permission filter applied BEFORE anything is rendered or searched. */
-function buildView(snap: PublishedSnapshot): View {
-  const sourceById = new Map(snap.sources.map((s) => [s.id, s]));
-  const chunkById = new Map(snap.chunks.map((c) => [c.id, c]));
-  const allowed = (chunkId: string) => {
-    const ch = chunkById.get(chunkId);
-    const src = ch && sourceById.get(ch.sourceId);
-    return !!src && src.visibility === 'team';
-  };
-  const visible: Claim[] = [];
-  const shadows: Claim[] = [];
-  for (const c of snap.claims) {
-    if (!c.evidence.length) { visible.push(c); continue; }
-    const ev = c.evidence.filter((e) => allowed(e.chunkId));
-    if (ev.length) visible.push({ ...c, evidence: ev });
-    else shadows.push({ ...c, statement: '', originalStatement: '', evidence: [], people: [] }); // content withheld
-  }
-  // restricted chunks are dropped from the successor's copy entirely
-  const okChunks = new Map([...chunkById].filter(([id]) => allowed(id)));
-  return { snap, visible, shadows, chunkById: okChunks, sourceById };
-}
 
 export default function Handover({ go }: { go: (p: string) => void }) {
   const { project, update, role, actorName } = useStore();
@@ -173,6 +145,8 @@ export default function Handover({ go }: { go: (p: string) => void }) {
           <button className="btn" onClick={exportMd}>Export Markdown</button>
         </div>
       </div>
+
+      {(project.history?.length ?? 0) >= 2 && <VersionDiffPanel history={project.history!} wsName={new Map(project.workstreams.map((w) => [w.id, w.name]))} />}
 
       <div className="card ask">
         <h3>Ask the handover</h3>

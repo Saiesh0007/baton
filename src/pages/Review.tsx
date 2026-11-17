@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useStore } from '../store';
 import type { Claim, ClaimType, ReviewRecord, ReviewState } from '../types';
 import ClaimCard from '../components/ClaimCard';
-import { riskRank } from '../lib/analyze';
+import { approvalBasis, riskRank } from '../lib/analyze';
 import { BandStat, Empty, Tick } from '../ui';
 import { TYPE_LABEL } from '../meta';
 import { CountUp, EASE_OUT, Explain, reducedMotion, useLater } from '../motion';
@@ -37,6 +37,7 @@ export default function Review({ go }: { go: (p: string) => void }) {
   const queue = live
     .filter((c) => filter === 'all' || c.review === filter || recent[c.id] !== undefined)
     .sort((x, y) => riskRank(x) - riskRank(y));
+  const stale = live.filter((c) => c.stale).length;
   const counts = { pending: live.filter((c) => c.review === 'pending').length, approved: live.filter((c) => c.review === 'approved').length, rejected: live.filter((c) => c.review === 'rejected').length };
 
   const blockReason = (c: Claim) =>
@@ -49,20 +50,36 @@ export default function Review({ go }: { go: (p: string) => void }) {
     const rec: ReviewRecord = {
       state,
       statement: statement ?? prev?.statement,
-      versions: [...(prev?.versions ?? []), { statement: statement ?? c.statement, by: actorName, ts: new Date().toISOString(), action: statement !== undefined ? 'edit' : state }],
+      versions: [...(prev?.versions ?? []), { statement: statement ?? c.statement, by: actorName, ts: new Date().toISOString(), action: statement !== undefined ? 'edit' : c.stale && state === 'approved' ? 're-approved after source change' : state }],
+      // what this approval rests on, so a later re-sync can tell if the source changed underneath it
+      ...(state === 'approved' ? { basis: approvalBasis(c, a.chunkById), snapshot: { statement: c.statement, type: c.type, workstream: c.workstream } } : {}),
     };
-    update((p) => ({ ...p, reviews: { ...p.reviews, [c.id]: rec } }), `${statement !== undefined ? 'Edited' : state === 'approved' ? 'Approved' : state === 'rejected' ? 'Rejected' : 'Reset'} claim: "${(statement ?? c.statement).slice(0, 70)}"`);
+    // an approved claim whose quote left the source has no proposer behind it any more: keeping it
+    // means the reviewer now vouches for it, so it is stored as a manual claim (no quote) under the same id
+    const orphan = state === 'approved' && !!c.stale && !c.evidence.some((e) => e.verified) && !project.manualClaims.some((m) => m.id === c.id);
+    update((p) => ({
+      ...p,
+      reviews: { ...p.reviews, [c.id]: rec },
+      manualClaims: orphan ? [...p.manualClaims, { id: c.id, workstream: c.workstream, type: c.type, statement: c.statement, ts: new Date().toISOString() }] : p.manualClaims,
+    }), `${statement !== undefined ? 'Edited' : state === 'approved' ? 'Approved' : state === 'rejected' ? 'Rejected' : 'Reset'} claim: "${(statement ?? c.statement).slice(0, 70)}"`);
     if (statement === undefined && state !== 'pending' && filter !== state && filter !== 'all') holdFor([c.id]);
   };
 
   const bulkApprove = () => {
-    const ok = live.filter((c) => c.review === 'pending' && !blockReason(c) && (c.status === 'corroborated' || c.status === 'attested'));
+    // claims flagged by a re-sync always need a human look, never a bulk stamp
+    const ok = live.filter((c) => c.review === 'pending' && !c.stale && !blockReason(c) && (c.status === 'corroborated' || c.status === 'attested'));
     const say = (n: number) => { const k = Date.now(); setFlash({ n, k }); later(() => setFlash((f) => (f?.k === k ? null : f)), 2800); };
     if (!ok.length) { say(0); return; }
     update((p) => {
       const reviews = { ...p.reviews };
       const ts = new Date().toISOString();
-      ok.forEach((c) => { reviews[c.id] = { state: 'approved', statement: p.reviews[c.id]?.statement, versions: [...(p.reviews[c.id]?.versions ?? []), { statement: c.statement, by: actorName, ts, action: 'approved' }] }; });
+      ok.forEach((c) => {
+        reviews[c.id] = {
+          state: 'approved', statement: p.reviews[c.id]?.statement,
+          versions: [...(p.reviews[c.id]?.versions ?? []), { statement: c.statement, by: actorName, ts, action: 'approved' }],
+          basis: approvalBasis(c, a.chunkById), snapshot: { statement: c.statement, type: c.type, workstream: c.workstream },
+        };
+      });
       return { ...p, reviews };
     }, `Bulk-approved ${ok.length} Corroborated / Leaver-attested claims`);
     if (filter === 'pending') holdFor(ok.map((c) => c.id));
@@ -80,18 +97,23 @@ export default function Review({ go }: { go: (p: string) => void }) {
     const included = live.filter((c) => c.review === 'approved');
     const chunkIds = new Set(included.flatMap((c) => c.evidence.map((e) => e.chunkId)));
     const version = (project.published?.version ?? 0) + 1;
-    update((p) => ({
-      ...p,
-      published: {
-        version, ts: new Date().toISOString(), by: actorName,
+    const ts = new Date().toISOString();
+    update((p) => {
+      // a second click lands on the state the first one produced: it is a no-op, not a duplicate version
+      if ((p.published?.version ?? 0) >= version) return p;
+      const snap = {
+        version, ts, by: actorName,
         claims: included,
         chunks: a.chunks.filter((ch) => chunkIds.has(ch.id)),
         sources: a.sources,
         workstreams: p.workstreams,
         fields: a.fields,
         readiness: a.readiness,
-      },
-    }), `Published handover v${version} with ${included.length} approved claims`);
+      };
+      // keep earlier versions so the handover can show what changed (last 10)
+      const history = [...(p.history ?? (p.published ? [p.published] : [])), snap].slice(-10);
+      return { ...p, published: snap, history };
+    }, `Published handover v${version} with ${included.length} approved claims`);
     if (still) { go('handover'); return; }
     celebrate({ n: included.length, v: version, from: project.people.leaver, to: project.people.successor });
   };
@@ -107,7 +129,7 @@ export default function Review({ go }: { go: (p: string) => void }) {
             <div className="kicker">Step 4 · Review</div>
             <h2>Review queue</h2>
           </div>
-          <BandStat n={counts.pending} label={`waiting · ${counts.approved} approved`} />
+          <BandStat n={counts.pending} label={`waiting · ${counts.approved} approved${stale ? ` · ${stale} need re-review` : ''}`} />
         </div>
         <div className="row between wrap band-tools">
           <span />

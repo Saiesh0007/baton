@@ -383,3 +383,28 @@ mark.sweep { background: linear-gradient(var(--hl), var(--hl)) no-repeat 0 0 / 0
   .roles > span { display: none; }
   .readiness-chip { display: none; }
 }
+
+/* Round 3: claim proposer panel */
+.proposer { border: 1px solid var(--line); border-radius: var(--r-sm); padding: 10px 14px; margin: 12px 0; background: var(--card); }
+.proposer .progress { margin: 10px 0 6px; }
+.proposer-msg { margin-top: 8px; color: var(--warn); }
+.proposer-note { margin: 8px 0 0; }
+.stl-llm, .stl-rules { color: var(--muted); font-family: var(--mono, ui-monospace, monospace); font-size: 11.5px; }
+
+/* Round 3: re-sync flags and diffs */
+.stale-box { border-left: 3px solid var(--warn); background: var(--warn-soft); padding: 8px 12px; margin: 8px 0; border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+.stale-head { font-size: 13px; font-weight: 600; color: var(--warn); }
+.stale-diff { margin: 6px 0 0; white-space: pre-wrap; word-break: break-word; }
+.diff ins { background: var(--accent-soft); color: var(--accent); text-decoration: none; border-radius: 2px; }
+.diff del { color: var(--bad); text-decoration: line-through; opacity: .85; }
+.pill-stale { color: var(--warn); }
+.resync { padding: 4px 2px 8px; display: grid; gap: 8px; }
+.resync p { margin: 0; }
+.resync-paste textarea { width: 100%; margin: 6px 0; }
+.resync-result { border-top: 1px solid var(--line); padding-top: 8px; display: grid; gap: 6px; }
+label.btn.disabled { opacity: .45; pointer-events: none; }
+td.nowrap { white-space: nowrap; }
+.vdiff .kicker { margin-top: 10px; }
+.vlist { margin: 4px 0 0; padding-left: 18px; display: grid; gap: 4px; }
+.vlist.add li::marker { content: "+ "; color: var(--accent); }
+.vlist.del li::marker { content: "− "; color: var(--bad); }
