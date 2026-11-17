@@ -3,5 +3,7 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+  // read by Vercel when it compiles api/*.ts (tsc -b uses the referenced configs)
+  "compilerOptions": { "target": "ES2022", "module": "ESNext", "moduleResolution": "bundler", "skipLibCheck": true }
 }

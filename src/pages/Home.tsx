@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { newLlmState } from '../lib/llm';
 import { useStore } from '../store';
 import type { Project, Workstream } from '../types';
 import { uid, fmtDate } from '../lib/text';
@@ -58,7 +59,7 @@ export default function Home() {
       id: uid('prj'), name: f.name || 'Untitled handover', description: '',
       people: { leaver: f.leaver || 'Leaver', successor: f.successor || 'Successor', reviewer: f.reviewer || 'Reviewer' },
       workstreams: parseWorkstreams(f.ws), sources: [], chunks: [], answers: {}, reviews: {}, manualClaims: [],
-      acks: {}, successorQuestions: [], audit: [{ ts: now, actor: f.reviewer || 'Reviewer', action: 'Handover created' }], createdAt: now,
+      acks: {}, successorQuestions: [], audit: [{ ts: now, actor: f.reviewer || 'Reviewer', action: 'Handover created' }], createdAt: now, llm: newLlmState(),
     };
     setRole('reviewer');
     addProject(p);

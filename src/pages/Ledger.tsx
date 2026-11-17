@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useStore } from '../store';
 import type { ClaimStatus, ClaimType } from '../types';
 import ClaimCard from '../components/ClaimCard';
+import ProposerPanel from '../components/ProposerPanel';
 import { BandStat, Empty, EvidenceList, Tick } from '../ui';
 import { STATUS_META, TYPE_LABEL } from '../meta';
 import { Explain } from '../motion';
@@ -54,6 +55,7 @@ export default function Ledger({ go }: { go: (p: string) => void }) {
           </div>
         </div>
         <p className="lede">Every claim, with the quotes that prove it. Click a quote to see it in its source.</p>
+        <ProposerPanel compact />
         <Explain><p>The extractor <i>proposes</i> atomic claims (decision, owner, status, risk, dependency, next action, recurring issue, contact),
           each with a quote. The verifier then checks every quote word-for-word against the stored source text, groups duplicates across
           sources (corroboration) and compares claims on the same topic for contradictions. Click any quote to see it in its source.</p></Explain>
