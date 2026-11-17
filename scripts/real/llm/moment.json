@@ -1,0 +1,666 @@
+{
+ "model": "openai/gpt-oss-120b",
+ "cache": {
+  "osky4m.69": [],
+  "8n9dcz.73": [],
+  "1ecb9oi.51": [],
+  "1ur8x5.101": [],
+  "vrhbbx.110": [
+   {
+    "type": "decision",
+    "workstream": "time-zones-parsing",
+    "statement": "An internal date-default hook was added for Moment Timezone",
+    "quote": "[feature] Add internal date-default hook for Moment Timezone (#6451)"
+   }
+  ],
+  "m42x7y.124": [
+   {
+    "type": "decision",
+    "workstream": "general",
+    "statement": "Stack traces are now included in conditional deprecation warnings",
+    "quote": "[bugfix] Add stack traces to conditional deprecations"
+   }
+  ],
+  "10u59jn.65": [],
+  "mw5o0t.112": [],
+  "zj8orn.96": [],
+  "1c5jpod.102": [],
+  "50fxfo.268": [],
+  "1k9zhvs.145": [],
+  "u0s1od.73": [
+   {
+    "type": "decision",
+    "workstream": "general",
+    "statement": "A security threat model was added to the documentation",
+    "quote": "[misc] Add security threat model"
+   }
+  ],
+  "t7u14r.42": [],
+  "iqo9lj.31": [],
+  "xvngca.28": [],
+  "bzi4z4.224": [
+   {
+    "type": "decision",
+    "workstream": "locales",
+    "statement": "Locale parsing caches are reset after updates to avoid stale data",
+    "quote": "[bugfix] Reset locale parsing caches after updates (#6436)"
+   }
+  ],
+  "1yjf0ae.287": [
+   {
+    "type": "decision",
+    "workstream": "locales",
+    "statement": "Inherited lowercase long date formats are kept in a separate cache to prevent merging into child locales",
+    "quote": "[bugfix] Fix inherited lowercase long date formats (#6434)"
+   }
+  ],
+  "fpcbvz.213": [
+   {
+    "type": "decision",
+    "workstream": "general",
+    "statement": "Non‑Moment arguments are ignored in min and max calculations",
+    "quote": "[bugfix] Ignore non-Moment arguments in min and max (#6433)"
+   }
+  ],
+  "tnafrl.61": [],
+  "sj5pnf.45": [],
+  "1wjk7al.47": [
+   {
+    "type": "decision",
+    "workstream": "general",
+    "statement": "CI now includes a meta check for validation",
+    "quote": "[misc] add CI meta check for validation (#6408)"
+   }
+  ],
+  "1aozamv.49": [
+   {
+    "type": "owner",
+    "workstream": "locales",
+    "statement": "The locale reviewer agent skill was created and is owned by the locales team",
+    "quote": "[misc] Create locale reviewer agent skill (#6407)"
+   }
+  ],
+  "1ed25ep.40": [],
+  "np4yng.42": [],
+  "9kqc7i.57": [],
+  "13p3j62.30": [],
+  "xjuy8x.122": [],
+  "6hhmox.45": [],
+  "xp611f.48": [],
+  "1otadvz.74": [
+   {
+    "type": "status",
+    "workstream": "locales",
+    "statement": "German locales (de, de-at, de-ch) now parse short month names without a trailing dot.",
+    "quote": "[locale] de, de-at, de-ch: parse short months without trailing dot (#6396)"
+   }
+  ],
+  "16t7rng.27": [],
+  "12a4v1h.29": [],
+  "17vyq8a.61": [],
+  "17s8mes.52": [],
+  "mz34kq.62": [],
+  "s3fzvp.42": [],
+  "17t78ki.51": [
+   {
+    "type": "decision",
+    "workstream": "locales",
+    "statement": "Locale names are now normalized for lazy-loaded locales to ensure consistent naming.",
+    "quote": "[bugfix] Normalize lazy‑loaded locale names (#6386)"
+   }
+  ],
+  "q9epg3.62": [],
+  "1io562n.74": [],
+  "1lrrbq1.49": [],
+  "1miwspc.45": [],
+  "1qz3pbu.101": [],
+  "tgfhxf.47": [],
+  "1oysdqi.99": [],
+  "s5ezrl.100": [],
+  "pk1gof.126": [],
+  "19puw4b.333": [
+   {
+    "type": "decision",
+    "workstream": "general",
+    "statement": "The team will uninstall the FOSSA GitHub App and run scans on the develop branch after each merge, keeping the report green.",
+    "quote": "Since the published package has no actual dependencies, we don't need to run FOSSA on PRs.  Instead, we can uninstall the app and just run the scans on develop after a merge, which will keep the report green."
+   }
+  ],
+  "12f5399.35": [
+   {
+    "type": "owner",
+    "workstream": "general",
+    "statement": "A CODEOWNERS file has been added to define repository code owners.",
+    "quote": "[misc] add code owners file (#6385)"
+   }
+  ],
+  "qatkba.32": [
+   {
+    "type": "status",
+    "workstream": "general",
+    "statement": "The npm packaging issues have been fixed and the package can now be published correctly.",
+    "quote": "[misc] fix npm packaging (#6383)"
+   }
+  ],
+  "wi4utl.43": [],
+  "o0y4mb.48": [],
+  "1cu95kw.133": [],
+  "1alxk4u.291": [
+   {
+    "type": "issue",
+    "workstream": "locales",
+    "statement": "Develop CI failures were caused by recent locale changes and were fixed by converting the locale to the source tree's expected module format and aligning meridiems, 12‑hour formats, week settings, and test fixtures with CLDR data.",
+    "quote": "Fix develop CI failures from recent locale changes (#6379)"
+   }
+  ],
+  "9432s2.292": [
+   {
+    "type": "owner",
+    "workstream": "locales",
+    "statement": "adidaslevy is the maintainer responsible for fixing the ('L') format for Georgian and Flemish (Belgium Dutch) locales.",
+    "quote": "[locale] Fixed ('L') format for Georgian and Flemish (Belgium Dutch). (#6217)"
+   },
+   {
+    "type": "status",
+    "workstream": "locales",
+    "statement": "The ('L') format fix for Georgian and Flemish locales is completed and merged.",
+    "quote": "[locale] Fixed ('L') format for Georgian and Flemish (Belgium Dutch). (#6217)"
+   }
+  ],
+  "yuukki.54": [
+   {
+    "type": "owner",
+    "workstream": "locales",
+    "statement": "tekleayele added the Amharic (Ethiopia) locale (am‑et).",
+    "quote": "[locale] Add Amharic (Ethiopia) locale [am-et] (#6278)"
+   },
+   {
+    "type": "status",
+    "workstream": "locales",
+    "statement": "The Amharic locale addition is completed and merged.",
+    "quote": "[locale] Add Amharic (Ethiopia) locale [am-et] (#6278)"
+   }
+  ],
+  "1djyij8.45": [
+   {
+    "type": "owner",
+    "workstream": "locales",
+    "statement": "usamaJ17 fixed the Thursday shortcode for the Swedish (sv) locale.",
+    "quote": "fix: thursday shortcode for sv locale (#6289)"
+   },
+   {
+    "type": "status",
+    "workstream": "locales",
+    "statement": "The Thursday shortcode fix for sv locale is completed and merged.",
+    "quote": "fix: thursday shortcode for sv locale (#6289)"
+   }
+  ],
+  "11qo2du.65": [
+   {
+    "type": "owner",
+    "workstream": "locales",
+    "statement": "qmoya replaced straight quotes with curly quotes in the Catalan locale file.",
+    "quote": "[locale] ca.js: replace straight quotes with curly quotes (#6306)"
+   },
+   {
+    "type": "status",
+    "workstream": "locales",
+    "statement": "The quote replacement in ca.js is completed and merged.",
+    "quote": "[locale] ca.js: replace straight quotes with curly quotes (#6306)"
+   }
+  ],
+  "zpz7bx.842": [
+   {
+    "type": "task",
+    "workstream": "locales",
+    "statement": "Update Sinhala (si) translations with correct month names and minute translation; PR #6264 is open and awaiting review/merge.",
+    "quote": "[locale] Update Sinhala (si) translations"
+   },
+   {
+    "type": "issue",
+    "workstream": "locales",
+    "statement": "Sinhala locale lacks standard month abbreviations, requiring careful handling to avoid meaning changes.",
+    "quote": "Shortening Sinhala month names changes their meanings entirely"
+   }
+  ],
+  "rvlzxa.857": [
+   {
+    "type": "task",
+    "workstream": "general",
+    "statement": "Fix floating point error in duration.as(\"weeks\"); PR #6464 is open and needs review/merge.",
+    "quote": "[bugfix] Fix floating point error in duration.as(\"weeks\")"
+   }
+  ],
+  "13r4f8s.879": [
+   {
+    "type": "task",
+    "workstream": "locales",
+    "statement": "Parse month format variant for object‑shaped locales; PR #6467 is open and pending integration.",
+    "quote": "[bugfix] Parse the month format variant that object-shaped locales format with"
+   }
+  ],
+  "1a1xq0o.873": [
+   {
+    "type": "task",
+    "workstream": "general",
+    "statement": "Preserve interval of mixed‑sign durations in duration.abs(); PR #6460 is open and awaiting merge.",
+    "quote": "[bugfix] `duration.abs()`: preserve the interval of mixed-sign durations"
+   }
+  ],
+  "wqrilk.872": [
+   {
+    "type": "risk",
+    "workstream": "locales",
+    "statement": "The current `meridiemParse` regex for ug‑cn matches the shorter afternoon token first, causing strict parsing of afternoon times to fail.",
+    "quote": "Regex alternation is ordered and matches at the earliest position, so at the start of `چۈشتىن كېيىن` the shorter `چۈش` alternative wins and the longer afternoon form is unreachable"
+   }
+  ],
+  "1o1ds7q.841": [],
+  "1bo3v5i.867": [],
+  "13ky9tn.868": [],
+  "ux2ax8.867": [],
+  "1d0eizf.866": [
+   {
+    "type": "decision",
+    "workstream": "locales",
+    "statement": "Set `weekdaysParseExact: true` fixes full weekday name parsing for ga and mt locales.",
+    "quote": "Setting `weekdaysParseExact: true` fixes both; `ga` already does the same for months."
+   },
+   {
+    "type": "status",
+    "workstream": "locales",
+    "statement": "The fix for ga and mt weekday parsing is currently in an open PR.",
+    "quote": "Two weekday-name bugs, one in `dddd` parsing and one in Maltese `dd` output."
+   }
+  ],
+  "j48tif.863": [
+   {
+    "type": "issue",
+    "workstream": "locales",
+    "statement": "The Greek (el) locale cannot parse back genitive month names, causing formatted dates to be unreadable.",
+    "quote": "The `el` locale formats month names in the genitive case whenever a day number precedes them, but none of those genitive names can be parsed back."
+   }
+  ],
+  "1qwi02f.853": [
+   {
+    "type": "issue",
+    "workstream": "locales",
+    "statement": "Ur and Sd locales fail strict parsing of `LLLL` because the preparse/postformat separator does not match the pattern literal.",
+    "quote": "the literal token never matches, strict mode records an unused token plus an unused input chara"
+   }
+  ],
+  "1drzljt.879": [
+   {
+    "type": "decision",
+    "workstream": "general",
+    "statement": "Unparsable weekday names are now treated as a no‑op, matching the behavior of `month()`.",
+    "quote": "`month()` already treats an unparsable name as a no‑op (`setMonth` returns the moment unchanged), so this makes the two weekday setters follow the same rule."
+   },
+   {
+    "type": "status",
+    "workstream": "general",
+    "statement": "The change to keep the date when the weekday name is unparsable is in an open PR.",
+    "quote": "[bugfix] day()/isoWeekday(): keep the date when the weekday name is unparsable"
+   }
+  ],
+  "dhon7a.467": [
+   {
+    "type": "decision",
+    "workstream": "general",
+    "statement": "Cap the `chooseLocale` prefix walk at 50 sub‑tags to prevent super‑linear time and memory usage.",
+    "quote": "Cap the walk at `MAX_LOCALE_SUBTAGS = 50`; real tags are far shorter, so valid resolution is unchanged and over‑long names fall back to the global locale in bounded time."
+   },
+   {
+    "type": "status",
+    "workstream": "general",
+    "statement": "The `chooseLocale` prefix‑walk cap has been merged and is live.",
+    "quote": "[bugfix] Bound chooseLocale prefix walk for long locale names"
+   }
+  ],
+  "yl59t.551": [
+   {
+    "type": "decision",
+    "workstream": "general",
+    "statement": "Locale and format identifiers are now documented as caller‑validated inputs to limit unbounded resource use.",
+    "quote": "Clarifies in `THREAT_MODEL.md` and `SECURITY.md` that locale names and format strings are caller‑validated identifiers."
+   },
+   {
+    "type": "status",
+    "workstream": "general",
+    "statement": "The clarification of caller‑validated identifiers has been merged and is live.",
+    "quote": "[misc] Clarify locale and format identifiers are caller‑validated"
+   }
+  ],
+  "hhf175.241": [
+   {
+    "type": "issue",
+    "workstream": "locales",
+    "statement": "Montenegrin (me) locale used incorrect grammatical case for numbers above 20.",
+    "quote": "Fixes grammatical case selection in the Montenegrin (me) locale for numbers above 20."
+   },
+   {
+    "type": "task",
+    "workstream": "locales",
+    "statement": "Merge the PR fixing Montenegrin number case and verify tests pass.",
+    "quote": "[locale] me: fix grammatical case for numbers above 20"
+   }
+  ],
+  "b7xerk.860": [
+   {
+    "type": "task",
+    "workstream": "locales",
+    "statement": "The Vietnamese locale calendar week localization fix is pending in an open PR #6455.",
+    "quote": "The Vietnamese locale (`vi`) always added \"tuần trước\" (last week) or \"tuần tới\" (next week) to calendar output, even when the date was in the same week as the reference date."
+   }
+  ],
+  "3m43nm.44": [
+   {
+    "type": "task",
+    "workstream": "locales",
+    "statement": "Updates for Punjabi (India) locale are pending in an open PR #6269.",
+    "quote": "[locale] Updates for Punjabi (India) [pa-in]"
+   }
+  ],
+  "k2u72h.273": [
+   {
+    "type": "status",
+    "workstream": "locales",
+    "statement": "Moment was bumped to version 2.31.0 and new Amharic and Pashto locale outputs were released in PR #6452.",
+    "quote": "Bumps Moment to 2.31.0 and refreshes the committed release artifacts, including the new Amharic (Ethiopia) and Pashto locale outputs."
+   }
+  ],
+  "1x37c2q.247": [],
+  "yg6r03.860": [
+   {
+    "type": "decision",
+    "workstream": "time-zones-parsing",
+    "statement": "An internal `moment._getDefaultDateParts` hook was added for Moment Timezone to supply default date parts for omitted calendar fields.",
+    "quote": "Adds an internal `moment._getDefaultDateParts(config, now, forWeek)` hook that extensions can use to supply the year, month, and date for omitted calendar fields."
+   }
+  ],
+  "1qbb2ix.692": [
+   {
+    "type": "decision",
+    "workstream": "general",
+    "statement": "Conditional deprecation warnings now include stack traces after PR #6450.",
+    "quote": "This adds stack traces to `deprecateSimple()` warnings, covering:"
+   }
+  ],
+  "1dx1bn1.857": [],
+  "fm5ytz.840": [
+   {
+    "type": "decision",
+    "workstream": "time-zones-parsing",
+    "statement": "Parsed timezone offsets outside the range -12:00 to +14:00 are now rejected, making such moments invalid.",
+    "quote": "Reject parsed timezone offsets outside the real‑world range of `-12:00` through `+14:00`."
+   }
+  ],
+  "11prx2q.520": [
+   {
+    "type": "decision",
+    "workstream": "general",
+    "statement": "The build now includes the standard Moment.js metadata header in the unminified moment-with-locales.js bundle.",
+    "quote": "Fixes #5974 by adding the standard Moment.js metadata header to the unminified `moment-with-locales.js` bundle."
+   },
+   {
+    "type": "owner",
+    "workstream": "general",
+    "statement": "mattjohnsonpint merged the metadata inclusion change.",
+    "quote": "# chunk 1 · PR #6447 (merged) · by mattjohnsonpint"
+   }
+  ],
+  "z3e8g1.808": [
+   {
+    "type": "decision",
+    "workstream": "locales",
+    "statement": "Locale postformat transformations are now applied to direct calls to Locale#relativeTime and Locale#pastFuture.",
+    "quote": "Apply locale `postformat` transformations to direct calls to:\n- `Locale#relativeTime`\n- `Locale#pastFuture`"
+   },
+   {
+    "type": "owner",
+    "workstream": "locales",
+    "statement": "mattjohnsonpint merged the postformat fix.",
+    "quote": "# chunk 2 · PR #6448 (merged) · by mattjohnsonpint"
+   }
+  ],
+  "6pm9qa.417": [
+   {
+    "type": "decision",
+    "workstream": "general",
+    "statement": "Object.assign in duration.humanize was replaced with Moment's existing extend utility to support legacy runtimes.",
+    "quote": "Replace the Object.assign call used by duration.humanize with Moment's existing extend utility."
+   },
+   {
+    "type": "owner",
+    "workstream": "general",
+    "statement": "cuishuang merged the duration.humanize fix.",
+    "quote": "# chunk 3 · PR #6443 (merged) · by cuishuang"
+   }
+  ],
+  "1pc666t.861": [
+   {
+    "type": "decision",
+    "workstream": "locales",
+    "statement": "The locale loading check now uses hasOwnProp to prevent __proto__ and similar names from corrupting the global locale.",
+    "quote": "The fix swaps both lookups in `loadLocale` to use the existing `hasOwnProp` helper (already used elsewhere in this file) instead of a plain property check"
+   },
+   {
+    "type": "risk",
+    "workstream": "locales",
+    "statement": "Calling moment.locale('__proto__') could corrupt the global locale and cause TypeError in format/calendar/fromNow.",
+    "quote": "every later call to `format`/`calendar`/`fromNow` throws because `Object.prototype` obviously isn't a real `Locale`."
+   },
+   {
+    "type": "owner",
+    "workstream": "locales",
+    "statement": "afonsojanu merged the __proto__ locale fix.",
+    "quote": "# chunk 4 · PR #6442 (merged) · by afonsojanu"
+   }
+  ],
+  "1ugs85q.206": [
+   {
+    "type": "decision",
+    "workstream": "locales",
+    "statement": "fr-ca locale now matches fr for ordinals, fixing the incorrect \"Dimanche 2e avril\" output.",
+    "quote": "We say Samedi 1er avril, but not Dimanche 2e avril.\nThe correct for should be Dimanche 2 avril.\nThis has been fixed in `fr.json` but not in `fr-ca.json`."
+   },
+   {
+    "type": "owner",
+    "workstream": "locales",
+    "statement": "mrleblanc101 opened the fr-ca ordinal fix.",
+    "quote": "# chunk 5 · PR #6110 (closed) · by mrleblanc101"
+   }
+  ],
+  "zpk5wo.866": [
+   {
+    "type": "decision",
+    "workstream": "time-zones-parsing",
+    "statement": "Parsing a weekday with an incomplete date now correctly validates the moment instead of reporting a mismatch.",
+    "quote": "Parsing a weekday together with an incomplete date gives back an invalid moment:"
+   },
+   {
+    "type": "owner",
+    "workstream": "time-zones-parsing",
+    "statement": "mohit-nayak merged the weekday parsing fix.",
+    "quote": "# chunk 6 · PR #6437 (merged) · by mohit-nayak"
+   }
+  ],
+  "1tai7hr.681": [
+   {
+    "type": "decision",
+    "workstream": "general",
+    "statement": "A security threat model document was added and linked from SECURITY.md and the README Resources list.",
+    "quote": "Adds a `docs/threat-model.md` defining what is and is not a security vulnerability in Moment, and links it from `SECURITY.md` and the README Resources list."
+   },
+   {
+    "type": "owner",
+    "workstream": "general",
+    "statement": "UlisesGascon merged the security threat model addition.",
+    "quote": "# chunk 7 · PR #6445 (merged) · by UlisesGascon"
+   }
+  ],
+  "hzvh96.924": [
+   {
+    "type": "issue",
+    "workstream": "time-zones-parsing",
+    "statement": "moment(isoString) converts the embedded UTC offset to defaultZone in 2.31.0 when moment.tz.setDefault(zone) is active",
+    "quote": "[Bug] moment(isoString) converts the embedded UTC offset to defaultZone in 2.31.0 when moment.tz.setDefault(zone) is active"
+   }
+  ],
+  "iwpcts.315": [
+   {
+    "type": "task",
+    "workstream": "general",
+    "statement": "Fix the release workflow before the next release, as the manual update of master after v2.31.0 indicates a broken automation",
+    "quote": "The new release workflow was used on v2.31.0, but failed while updating `master` after npm was published.  The `master` branch was updated manually, so the release is ok, but we should fix this before the next release."
+   }
+  ],
+  "rg6pqr.992": [
+   {
+    "type": "issue",
+    "workstream": "locales",
+    "statement": "Angular builds warn about 'moment/locale/fr' as a CommonJS dependency, requiring addition of \"moment\" to allowedCommonJsDependencies in angular.json",
+    "quote": "it is getting resolved after adding \"moment\" into \"allowedCommonJsDependencies\" section of angular.json file."
+   }
+  ],
+  "d1nb6m.348": [],
+  "1u4i3ee.569": [],
+  "es4d2t.916": [
+   {
+    "type": "issue",
+    "workstream": "time-zones-parsing",
+    "statement": "Moments before 1940-05-15T23:40:00Z in CET/CEST display an incorrect UTC offset, showing a 5‑minute discrepancy",
+    "quote": "5 minute discrepancy between actual- and displayed UTC offset for moments before \"1940-05-15T23:40:00Z\" in CET/CEST"
+   }
+  ],
+  "1ib2ph3.855": [
+   {
+    "type": "issue",
+    "workstream": "time-zones-parsing",
+    "statement": "Moment.diff() returns an incorrect fractional year value for dates at the start of February, giving 60.9985 instead of a value larger than 61.",
+    "quote": "console.log(new moment(\"2021-02-01\").diff(\"1960-01-31\", \"years\", true)) //output: 60.998587570621474"
+   }
+  ],
+  "b9ocyy.200": [
+   {
+    "type": "issue",
+    "workstream": "time-zones-parsing",
+    "statement": "Parsing a single‑digit month token with format \"M\" fails, causing isValid() to return false for compact timestamps like \"2021529\".",
+    "quote": "moment(\"2021529\", \"YYYYMDD\").isValid() False"
+   }
+  ],
+  "b7in80.346": [
+   {
+    "type": "issue",
+    "workstream": "time-zones-parsing",
+    "statement": "Moment treats the date string \"31-10-2021\" with format \"YYYY-MM-DD\" as valid, even though the month and day are swapped.",
+    "quote": "moment('31-10-2021', 'YYYY-MM-DD').isValid() is giving true when it's not."
+   }
+  ],
+  "e3nfzh.655": [],
+  "1r8r55h.859": [
+   {
+    "type": "issue",
+    "workstream": "locales",
+    "statement": "Locale postformat functions are not applied to relativeTime outputs, resulting in numbers not being transformed to locale‑specific symbols.",
+    "quote": "relativeTime does not transform numbers and returns the decimal \"2\""
+   }
+  ],
+  "tjkxm5.845": [],
+  "bkomxf.892": [
+   {
+    "type": "issue",
+    "workstream": "time-zones-parsing",
+    "statement": "Moment.js does not validate that a timezone offset falls within the real‑world range of -12:00 to +14:00, allowing out‑of‑range offsets and still returning isValid() true.",
+    "quote": "Moment.js does not validate that a timezone offset parsed from an ISO-8601 string, or passed numerically to utcOffset(), falls within the real world range of -12:00 to +14:00"
+   }
+  ],
+  "kpivwm.882": [
+   {
+    "type": "risk",
+    "workstream": "locales",
+    "statement": "Using locale name \"__proto__\" corrupts the global locale registry and breaks formatting.",
+    "quote": "moment.locale('__proto__') corrupts the global locale and breaks formatting"
+   }
+  ],
+  "24y63g.875": [
+   {
+    "type": "issue",
+    "workstream": "time-zones-parsing",
+    "statement": "The format string \"ddd DD\" is rejected as invalid while similar strings are accepted, causing parsing failures.",
+    "quote": "`ddd DD` is an invalid format whereas `DD`, `ddd`, and `ddd YYYY` are valid"
+   }
+  ],
+  "y0wrcp.923": [
+   {
+    "type": "issue",
+    "workstream": "project-status",
+    "statement": "The issue backlog contains 46+ bugs opened before 2023, indicating a maintenance‑mode gap.",
+    "quote": "46+ bugs open from pre-2023, 1 bug fixed in ~20 months — the \"maintenance mode\" gap"
+   }
+  ],
+  "5pwhgj.845": [
+   {
+    "type": "task",
+    "workstream": "locales",
+    "statement": "Fix typo mistakes in the Gujarati locale file (gu.js) and include the fix in the next release.",
+    "quote": "Typo Mistake in gu.js (in Gujarati Language)"
+   }
+  ],
+  "1r3d3ty.573": [],
+  "19vr273.79": [],
+  "l7gdqo.77": [
+   {
+    "type": "status",
+    "workstream": "project-status",
+    "statement": "Moment.js is a legacy project, now in maintenance mode.",
+    "quote": "⚠️ Moment.js is a legacy project, now in **maintenance mode**. New features"
+   }
+  ],
+  "61qhgq.51": [],
+  "xe22ub.61": [],
+  "gv7h43.78": [],
+  "9jaxwc.68": [],
+  "b8pl9v.45": [],
+  "1imwwys.27": [],
+  "1yt8ylg.71": [],
+  "117iid6.32": [],
+  "19ughr9.33": [],
+  "u381v.65": [],
+  "1wkz7yx.79": [],
+  "1g4mu94.40": [],
+  "18gackm.36": [],
+  "4w3j49.152": [],
+  "11q7h73.132": [],
+  "1icasc9.24": [],
+  "o3qhxe.79": [],
+  "10e4iru.81": [],
+  "2xamwx.63": [],
+  "nmdkcc.57": [],
+  "a4lrfr.61": [],
+  "1ypp0hs.79": [],
+  "1q5o5la.79": [],
+  "71k63.80": [],
+  "cn6gkz.67": [],
+  "1s82txa.47": [],
+  "4dwdb9.42": [],
+  "170wax1.39": [],
+  "1gixksj.57": [],
+  "7crpzu.59": [],
+  "tbaeie.55": [],
+  "1brr6ob.51": [],
+  "1bdmdqu.55": [],
+  "1qp0yfe.57": [],
+  "1rp6vta.77": [],
+  "1d9o4fd.22": [],
+  "1xnluq1.43": [],
+  "hfset.71": [],
+  "5s9fft.74": [],
+  "1pmkcoi.70": [],
+  "15q8i1v.84": [],
+  "m4pmb2.68": [],
+  "10y2tot.116": [],
+  "1h8kzcn.111": [],
+  "afpu2n.61": []
+ }
+}

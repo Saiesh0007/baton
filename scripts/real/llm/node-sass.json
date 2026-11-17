@@ -1,0 +1,418 @@
+{
+ "model": "openai/gpt-oss-120b",
+ "cache": {
+  "n4lso5.96": [
+   {
+    "type": "decision",
+    "workstream": "node-support",
+    "statement": "Node 20 support has been added to the project.",
+    "quote": "feat: Node 20 support (#3355)"
+   }
+  ],
+  "yxgyrf.106": [
+   {
+    "type": "decision",
+    "workstream": "node-support",
+    "statement": "Node 18 and Node 19 support have been added and Node 17 support has been dropped.",
+    "quote": "feat: Node 18 and 19 support and drop Node 17 (#3257)"
+   }
+  ],
+  "wkjh1d.49": [
+   {
+    "type": "dependency",
+    "workstream": "build-binaries",
+    "statement": "node-gyp and nan were bumped to enable Node 19 support.",
+    "quote": "Bump node-gyp and nan for node 19 support (#3314)"
+   }
+  ],
+  "1vn1017.47": [
+   {
+    "type": "issue",
+    "workstream": "build-binaries",
+    "statement": "Binaries were previously partially downloaded, a fix has been applied.",
+    "quote": "Fix binaries being partially downloaded (#3313)"
+   }
+  ],
+  "xid07n.108": [],
+  "ydqotq.36": [],
+  "m65c3p.31": [
+   {
+    "type": "decision",
+    "workstream": "node-support",
+    "statement": "Support for Node 12 has been removed.",
+    "quote": "feat: Drop Node 12"
+   }
+  ],
+  "1ottpz9.72": [],
+  "ml232k.50": [],
+  "v4p4lb.117": [],
+  "164knmj.105": [],
+  "vvk6pi.70": [],
+  "18qzy3m.45": [],
+  "12d7q2j.190": [],
+  "5szgtf.58": [
+   {
+    "type": "decision",
+    "workstream": "node-support",
+    "statement": "Support for EOL Node 15 has been removed.",
+    "quote": "chore: Drop EOL Node 15 (#3122)"
+   }
+  ],
+  "18tyrz6.93": [
+   {
+    "type": "decision",
+    "workstream": "node-support",
+    "statement": "Node 17 support has been added.",
+    "quote": "feat: Add Node 17 support (#3195)"
+   }
+  ],
+  "fh0yew.44": [],
+  "1lg1at8.95": [],
+  "yzchdv.76": [],
+  "t5runm.42": [],
+  "u0qg02.156": [],
+  "15h3tn.27": [
+   {
+    "type": "decision",
+    "workstream": "node-support",
+    "statement": "Support for Node 10 has been removed.",
+    "quote": "chore: Drop Node 10 support"
+   }
+  ],
+  "1rdm3vn.190": [],
+  "1kpykxh.116": [],
+  "xs4z6e.103": [
+   {
+    "type": "decision",
+    "workstream": "node-support",
+    "statement": "Node 16 support has been added.",
+    "quote": "chore: Add Node 16 support"
+   }
+  ],
+  "8dqf19.25": [],
+  "iurxl9.28": [],
+  "11pekii.20": [
+   {
+    "type": "status",
+    "workstream": "general",
+    "statement": "OpenBSD support has been added to the project.",
+    "quote": "Add  OpenBSD support"
+   }
+  ],
+  "ps5x98.69": [
+   {
+    "type": "decision",
+    "workstream": "node-support",
+    "statement": "The project will add support for Node 22 in the upcoming release.",
+    "quote": "Add support for Node 22"
+   },
+   {
+    "type": "task",
+    "workstream": "node-support",
+    "statement": "Merge the open PR #3418 to finalize Node 22 support and dependency updates.",
+    "quote": "Closes #3415"
+   }
+  ],
+  "162i42a.60": [
+   {
+    "type": "decision",
+    "workstream": "general",
+    "statement": "MacOS ARM support is being tested using new CI runners for arm64.",
+    "quote": "feat: add MacOS ARM"
+   },
+   {
+    "type": "task",
+    "workstream": "general",
+    "statement": "Complete testing and merge PR #3390 to enable MacOS ARM builds.",
+    "quote": "Testing out the new CI runners for arm64"
+   }
+  ],
+  "1uhdxkx.74": [],
+  "1sbkcoj.232": [
+   {
+    "type": "decision",
+    "workstream": "node-support",
+    "statement": "Node 21 support is added while Node 16 support is removed.",
+    "quote": "Node 21 support added (used reference: https://github.com/sass/node-sass/pull/3355)"
+   },
+   {
+    "type": "risk",
+    "workstream": "node-support",
+    "statement": "Removing Node 16 support may break existing users still on that version.",
+    "quote": "Node 16 support is removed (so the tests passes, same PR is already open for some time"
+   }
+  ],
+  "ykblkn.840": [],
+  "p9dh1v.782": [
+   {
+    "type": "issue",
+    "workstream": "maintenance-status",
+    "statement": "There is an ongoing discussion to declare the repository end‑of‑life due to lack of releases and broken installations.",
+    "quote": "Is it time for end-of-life?"
+   },
+   {
+    "type": "task",
+    "workstream": "maintenance-status",
+    "statement": "Decide on and announce the end‑of‑life status, archive the repo, and update the npm package label.",
+    "quote": "we should officially mark it as end-of-life, archive the repository, and update the npm package to say \"END OF LIFE\""
+   }
+  ],
+  "1kestgi.886": [],
+  "vyyxu.461": [
+   {
+    "type": "issue",
+    "workstream": "build-binaries",
+    "statement": "Node‑sass 9.0.0 works with Node 21 but lacks pre‑built binaries, causing longer CI builds.",
+    "quote": "there are no pre-built binaries for it"
+   }
+  ],
+  "9l9keo.893": [],
+  "lvnc7h.31": [],
+  "8i5kcj.845": [
+   {
+    "type": "issue",
+    "workstream": "build-binaries",
+    "statement": "The node-sass binary for darwin-arm64-108 fails to load, causing installation errors on Apple Silicon Macs.",
+    "quote": "Binary has a problem: Error: dlopen(/Users/shekaicong/D/Project/apaas-fontend/node_modules/node-sass/vendor/darwin-arm64-108/binding.node, 0x0001)"
+   }
+  ],
+  "jgd13u.855": [
+   {
+    "type": "decision",
+    "workstream": "node-support",
+    "statement": "When using the latest Node versions you must use the latest node-sass because old node-sass versions are not back‑ported.",
+    "quote": "we don't backport support to old versions of node-sass"
+   }
+  ],
+  "44ocyt.860": [
+   {
+    "type": "decision",
+    "workstream": "general",
+    "statement": "node-sass cannot add new Sass language features like @use or @forward because it is only a LibSass wrapper.",
+    "quote": "Before you request a feature, please realize this project is a wrapper for LibSass so we can't add any language features here"
+   }
+  ],
+  "gkbdgh.820": [
+   {
+    "type": "risk",
+    "workstream": "maintenance-status",
+    "statement": "Several transitive dependencies of node-sass are deprecated and no longer supported, increasing maintenance risk.",
+    "quote": "npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it"
+   }
+  ],
+  "1y3z28i.850": [
+   {
+    "type": "decision",
+    "workstream": "node-support",
+    "statement": "Angular‑devkit requires node‑sass 4.13 when running on Node 13.",
+    "quote": "If you're running Node 13, you must be running node-sass 4.13"
+   }
+  ],
+  "lrnchm.905": [
+   {
+    "type": "risk",
+    "workstream": "build-binaries",
+    "statement": "The binary for node‑sass v3.13.1 is missing from the release assets, causing builds for the legacy app to fail.",
+    "quote": "Cannot download \"https://github.com/sass/node-sass/releases/download/v3.13.1/linux-x64-57_binding.node\": HTTP error 404 Not Found"
+   }
+  ],
+  "1qmmj9y.846": [
+   {
+    "type": "risk",
+    "workstream": "build-binaries",
+    "statement": "The node‑sass 8.0.0 binary is not a valid Win32 application, breaking installation on Windows.",
+    "quote": "Binary has a problem: Error: \\\\?\\C:\\..\\..\\node_modules\\node-sass\\vendor\\win32-x64-115\\binding.node is not a valid Win32 application."
+   }
+  ],
+  "19wn0jq.844": [],
+  "3aq82t.822": [
+   {
+    "type": "decision",
+    "workstream": "node-support",
+    "statement": "The project does not backport support to old versions of node‑sass.",
+    "quote": "we don't backport support to old versions of node-sass"
+   }
+  ],
+  "117v8oj.863": [
+   {
+    "type": "decision",
+    "workstream": "node-support",
+    "statement": "The project does not backport support to old versions of node‑sass.",
+    "quote": "we don't backport support to old versions of node-sass"
+   }
+  ],
+  "d8bl68.166": [],
+  "18w18rj.855": [
+   {
+    "type": "issue",
+    "workstream": "general",
+    "statement": "Node‑Sass 4.14.1 install script fails on Windows 10 with Node 14.16.0, despite clean reinstall attempts.",
+    "quote": "Error: node-sass@4.14.1 install: `node scripts/install.js`"
+   }
+  ],
+  "62nnuo.857": [],
+  "104jnte.892": [
+   {
+    "type": "issue",
+    "workstream": "general",
+    "statement": "rgb/rgba functions misinterpret CSS variables, causing a compile error that `$color` must be a color.",
+    "quote": "rgb and rgba functions misinterpret CSS variables as a single value instead of their output"
+   }
+  ],
+  "bgjuou.826": [
+   {
+    "type": "risk",
+    "workstream": "build-binaries",
+    "statement": "The Node‑Sass binary for win32‑x64‑120 is not a valid Win32 application on Windows 11 with Node 21.4.0.",
+    "quote": "Binary has a problem: Error: ...............\\node_modules\\node-sass\\vendor\\win32-x64-120\\binding.node is not a valid Win32 application."
+   }
+  ],
+  "euiizt.842": [
+   {
+    "type": "risk",
+    "workstream": "build-binaries",
+    "statement": "Node‑Sass installation fails on Apple M1 (arm64) machines.",
+    "quote": "Installing node-sass fails on Mac with M1"
+   }
+  ],
+  "1sdbjar.73": [
+   {
+    "type": "status",
+    "workstream": "maintenance-status",
+    "statement": "Node Sass is in end‑of‑life and will receive no more releases, even for security fixes.",
+    "quote": "**Warning:** [Node Sass has reached end of life]. It will receive no more"
+   }
+  ],
+  "mrl2mg.78": [
+   {
+    "type": "decision",
+    "workstream": "maintenance-status",
+    "statement": "Projects still using Node Sass should migrate to Dart Sass.",
+    "quote": "Projects that still use it should move onto"
+   }
+  ],
+  "cpa34b.45": [
+   {
+    "type": "dependency",
+    "workstream": "maintenance-status",
+    "statement": "Dart Sass is the recommended replacement for Node Sass.",
+    "quote": "[Dart Sass](https://sass-lang.com/dart-sass)."
+   }
+  ],
+  "64c9az.88": [],
+  "1ebc53q.126": [],
+  "rznqg5.145": [
+   {
+    "type": "decision",
+    "workstream": "maintenance-status",
+    "statement": "Node versions that hit end of life will be dropped from support at each node‑sass release (major, minor).",
+    "quote": "Node versions that hit end of life <https://github.com/nodejs/Release>, will be dropped from support at each node-sass release (major, minor)."
+   }
+  ],
+  "fcz7om.189": [
+   {
+    "type": "decision",
+    "workstream": "build-binaries",
+    "statement": "We will stop building binaries for unsupported releases, testing for breakages in dependency compatibility, but will not block installations for those that want to support themselves.",
+    "quote": "We will stop building binaries for unsupported releases, testing for breakages in dependency compatibility, but we will not block installations for those that want to support themselves."
+   }
+  ],
+  "vxl52k.212": [
+   {
+    "type": "decision",
+    "workstream": "node-support",
+    "statement": "We will open a single issue for interested parties to subscribe to, and close additional issues when new node releases require minor internal changes and CI support.",
+    "quote": "New node release require minor internal changes along with support from CI providers (AppVeyor, GitHub Actions). We will open a single issue for interested parties to subscribe to, and close additional issues."
+   }
+  ],
+  "1h17wen.79": [],
+  "10y1af1.51": [],
+  "1yl45j2.130": [],
+  "1rp7aes.116": [],
+  "1pgpflf.57": [],
+  "1u3ries.79": [],
+  "1itdq8o.21": [],
+  "1i2exph.283": [],
+  "v6g6do.115": [],
+  "1awal0n.179": [],
+  "2rg11u.41": [],
+  "uhyzrl.138": [],
+  "1j56x4a.76": [],
+  "si1vg7.32": [],
+  "12r73fp.20": [],
+  "9gxv7u.30": [],
+  "tnevrf.47": [],
+  "kctuqe.40": [],
+  "tsyfzo.181": [],
+  "192skc9.62": [],
+  "i8p4l8.69": [],
+  "7ln2m6.22": [],
+  "1ueodly.36": [],
+  "isct6q.76": [],
+  "1w7c7w9.48": [],
+  "et4rfc.107": [],
+  "14alqe1.65": [],
+  "gzszft.96": [],
+  "tsp4xv.328": [],
+  "ylhc6w.229": [],
+  "4iazad.150": [],
+  "15sj2n0.21": [],
+  "1oleex8.97": [],
+  "l3vtyq.88": [],
+  "q2logm.35": [],
+  "njob0s.26": [],
+  "huif8i.39": [],
+  "1hb7g1h.376": [],
+  "9a92ua.469": [],
+  "fp347t.83": [],
+  "twecf4.76": [],
+  "13ihux.68": [],
+  "nccqi7.70": [],
+  "15c14ax.72": [],
+  "uwqusa.71": [],
+  "1i8cnxu.71": [],
+  "9b8f9p.45": [],
+  "flf5bk.27": [],
+  "t8p122.42": [],
+  "10rk32h.80": [],
+  "s0z85t.82": [],
+  "nx7s2v.127": [],
+  "1gvrvgi.83": [],
+  "1b8gchb.42": [],
+  "95os3j.46": [],
+  "mul5wp.57": [],
+  "1bny3th.50": [],
+  "16ixvki.46": [],
+  "1dze8e6.38": [],
+  "1vxti61.53": [],
+  "xcqrjr.23": [],
+  "1ookea1.151": [],
+  "1rjcn6o.143": [],
+  "qqkkxh.192": [],
+  "142ec9q.72": [],
+  "mt6mpo.74": [],
+  "1dgc130.86": [],
+  "zksrrp.93": [
+   {
+    "type": "risk",
+    "workstream": "build-binaries",
+    "statement": "When using this option, you must also specify outFile to avoid unexpected behavior.",
+    "quote": "**Special:** When using this, you should also specify `outFile` to avoid unexpected behavior."
+   }
+  ],
+  "rg2nab.81": [],
+  "3ya83l.23": [],
+  "10j2zjm.56": [],
+  "yro2wi.160": [],
+  "6ozr2k.155": [],
+  "1cv22z8.38": [],
+  "mk7wxt.27": [],
+  "1pbskzv.71": [],
+  "1vzjhfn.66": [],
+  "1bfk144.58": [],
+  "ofya7g.22": [],
+  "1aht12r.55": [],
+  "ajnqvm.52": [],
+  "qnrp8q.89": []
+ }
+}

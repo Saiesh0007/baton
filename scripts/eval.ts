@@ -1,15 +1,27 @@
 /**
  * Seeded-data evaluation: runs the pipeline on the synthetic demo dataset and checks it
- * against the ground truth planted in it. Run: npx tsx scripts/eval.ts
+ * against the ground truth planted in it. Run: npx tsx scripts/eval.ts [--llm]
+ * --llm uses the saved LLM proposals in scripts/real/llm/demo.json (made by: npx tsx scripts/eval-llm.ts demo).
  */
 import { buildDemoProject } from '../src/lib/demo';
 import { analyze } from '../src/lib/analyze';
 import { norm } from '../src/lib/text';
+import { FIELDS } from '../src/types';
+import { readFileSync } from 'node:fs';
 
+const useLlm = process.argv.includes('--llm');
 const p = buildDemoProject();
+p.llm = useLlm
+  ? { enabled: true, model: 'saved', cache: JSON.parse(readFileSync(new URL('./real/llm/demo.json', import.meta.url), 'utf8')).cache }
+  : undefined;
 const a = analyze(p);
+// a planted fact counts as found if a claim in the right workstream AND the right handover field
+// (Owner / Status / Last decision / Risks & blockers / Next action) states it, or cites it in a verified
+// quote. Field, not exact type: risk, issue and dependency all fill "Risks & blockers".
+const fieldOf = (t: string) => FIELDS.find((f) => (f.types as string[]).includes(t))?.key ?? t;
 const has = (ws: string, type: string, needle: string) =>
-  a.claims.some((c) => c.workstream === ws && c.type === type && norm(c.statement).includes(norm(needle)));
+  a.claims.some((c) => c.workstream === ws && fieldOf(c.type) === fieldOf(type) &&
+    (norm(c.statement).includes(norm(needle)) || c.evidence.some((e) => e.verified && norm(e.quote).includes(norm(needle)))));
 
 const facts: [string, boolean][] = [
   ['Owner: Aarav owns registration app', has('registration', 'owner', 'Aarav owns the registration app')],
@@ -38,7 +50,7 @@ const leadsSrc = new Set(p.sources.filter((s) => s.visibility === 'leads').map((
 const allText = p.chunks.map((c) => c.text).join('\n');
 
 const recall = facts.filter(([, ok]) => ok).length;
-console.log('Baton seeded evaluation (synthetic demo dataset)\n');
+console.log(`Baton seeded evaluation (synthetic demo dataset) · proposer: ${useLlm ? 'LLM (saved proposals)' : 'rules'}\n`);
 facts.forEach(([n, ok]) => console.log(`${ok ? 'PASS' : 'MISS'}  ${n}`));
 console.log(`\nClaim recall on planted facts:      ${recall}/${facts.length} (${Math.round((recall / facts.length) * 100)}%)`);
 console.log(`Planted contradictions detected:    ${conflictsFound.length}/${conflictsPlanted.length}  (false conflict questions: ${falseConflicts})`);

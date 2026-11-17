@@ -1,0 +1,222 @@
+{
+ "model": "openai/gpt-oss-120b",
+ "cache": {
+  "k06kq3.181": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Swallow late busboy errors after teardown to prevent crashes",
+    "quote": "fix: swallow late busboy error after teardown"
+   }
+  ],
+  "pc1hkl.63": [],
+  "1m1h581.354": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Do not add a failed upload to the abort cleanup list when storage engine reports an error",
+    "quote": "fix: don't add a failed upload to the abort cleanup list (#1489)"
+   }
+  ],
+  "t9tjrt.101": [],
+  "1hm1m2q.97": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Allow DiskStorage to be used without providing options",
+    "quote": "feat: allow diskStorage without options (#1471)"
+   }
+  ],
+  "age11e.109": [],
+  "a9hr2u.109": [],
+  "1lwxtu2.90": [],
+  "1uz051y.303": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Remove late‑completing uploads aborted before the engine assigns a path",
+    "quote": "fix: remove late-completing uploads aborted before the engine names them"
+   }
+  ],
+  "ub7qtl.260": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Add a streamHandler option to feed busboy from pre‑consumed request bodies",
+    "quote": "feat: add streamHandler option to feed busboy from pre-consumed bodies (#1466)"
+   }
+  ],
+  "108daye.41": [],
+  "eio7d7.77": [],
+  "f4157n.78": [],
+  "18xxybv.210": [],
+  "13rizrk.169": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Expose busboy defCharset, highWaterMark and fileHwm options",
+    "quote": "feat: expose busboy defCharset, highWaterMark and fileHwm options (#1465)"
+   }
+  ],
+  "1aj4eev.168": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Add a flush option to DiskStorage to fsync files before completion",
+    "quote": "fix: add flush option to disk storage to fsync files before completion (#1458)"
+   }
+  ],
+  "63xfxz.236": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Accept a function for limits so they can be computed per request",
+    "quote": "feat: accept a function for limits (#1133)"
+   }
+  ],
+  "1tnz2yx.376": [],
+  "jc93rr.337": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Validate all limits at construction time and throw TypeError for invalid values",
+    "quote": "fix: validate all limits at construction time (#1335)"
+   }
+  ],
+  "1hzag3d.360": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Do not consume maxCount for files skipped by fileFilter",
+    "quote": "fix: do not consume maxCount for files skipped by fileFilter (#1426)"
+   }
+  ],
+  "1jnijn9.303": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Allow exactly limits.parts parts by adjusting busboy parts limit handling",
+    "quote": "fix: allow exactly limits.parts parts (#1446)"
+   }
+  ],
+  "hbbsab.283": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Throw a TypeError at construction time unless the fileSize limit value is an integer or Infinity.",
+    "quote": "Throw a TypeError at construction time unless the value is an integer or Infinity."
+   }
+  ],
+  "1f5tss7.294": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Remove the concat-stream dependency and let MemoryStorage collect and Buffer.concat chunks itself.",
+    "quote": "Drops concat-stream and its transitive dependencies (readable-stream, buffer-from, typedarray, inherits) from the production install."
+   }
+  ],
+  "yigyyw.203": [],
+  "zdcycj.161": [],
+  "1savyv6.81": [],
+  "1xyij18.40": [],
+  "1qx0mgu.156": [
+   {
+    "type": "decision",
+    "workstream": "security",
+    "statement": "Reject invalid field names instead of crashing on append-field errors.",
+    "quote": "fix: reject invalid field names instead of crashing on append-field errors"
+   }
+  ],
+  "14jiskp.100": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Enforce file size limit when using an async fileFilter.",
+    "quote": "fix: enforce file size limit with async fileFilter"
+   }
+  ],
+  "1i4lwqj.193": [
+   {
+    "type": "issue",
+    "workstream": "uploads-storage",
+    "statement": "Previously aborted uploads could leak file descriptors; the fix destroys the disk write stream on abort.",
+    "quote": "fix: destroy disk write stream on aborted uploads to prevent fd leak"
+   }
+  ],
+  "9dwm7l.197": [],
+  "enl385.143": [],
+  "3jladb.42": [],
+  "bkolzb.48": [],
+  "1h1laf8.154": [],
+  "116dcvu.51": [],
+  "11yndsl.66": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Decode WHATWG-escaped characters in the file originalname.",
+    "quote": "fix: decode WHATWG-escaped characters in file originalname"
+   }
+  ],
+  "1pljf5f.98": [],
+  "bk70g5.117": [],
+  "15i7lz3.185": [
+   {
+    "type": "issue",
+    "workstream": "uploads-storage",
+    "statement": "Multiple callbacks from fileFilter could crash the process; the fix guards against it.",
+    "quote": "fix: prevent process crash when fileFilter calls its callback more than once"
+   }
+  ],
+  "uoixa.43": [],
+  "1ljvged.66": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Fallback to an error code when no message mapping exists for an error.",
+    "quote": "fix: fallback to error code when no message mapping exists"
+   }
+  ],
+  "n26mf.213": [
+   {
+    "type": "task",
+    "workstream": "general",
+    "statement": "Enhance cross‑platform test reliability and update the CI workflow to run on Windows and Linux.",
+    "quote": "Test: Enhance cross-platform test reliability and update CI workflow"
+   }
+  ],
+  "n5lc9k.92": [],
+  "1tpoq0s.185": [],
+  "bln98s.37": [],
+  "44tntc.90": [],
+  "rgpxan.140": [],
+  "g8608q.211": [],
+  "1xmt6wz.132": [],
+  "17zyqg0.62": [],
+  "4bffa3.881": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Set isDone flag in the Busboy constructor catch block to prevent calling next() twice when the request closes after a busboy failure",
+    "quote": "The fix sets `isDone` in the catch block. `done()` and `handleRequestFailure` already check that flag, so the listeners stay in place but no longer call `next` again."
+   },
+   {
+    "type": "risk",
+    "workstream": "uploads-storage",
+    "statement": "If isDone is not set, the middleware could call next() a second time, leading to duplicate error handling",
+    "quote": "If the client then disconnects, or the app destroys the request to stop reading it, `handleRequestFailure` runs and `next` is called a second time"
+   }
+  ],
+  "jwd1fa.859": [],
+  "1hyjhf9.196": [],
+  "5p2rlr.847": [],
+  "1v3a2sa.501": [],
+  "1qbsf5y.314": [
+   {
+    "type": "decision",
+    "workstream": "uploads-storage",
+    "statement": "Add new limits totalFieldSize and totalFileSize to control aggregate payload sizes",
+    "quote": "This PR adds two new limits: `totalFieldSize` and `totalFileSize`"
+   }
+  ]
+ }
+}
