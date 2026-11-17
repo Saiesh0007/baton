@@ -64,6 +64,8 @@ export interface Claim {
   edited: boolean;
   versions: Version[];
   note?: string;
+  /** Round 3: placeholder in the successor's copy for a claim backed only by leads-only sources */
+  restricted?: boolean;
   /** Round 3: set when an approval's source text changed since it was approved */
   stale?: { reason: string; before?: string; after?: string; ref?: string };
 }
@@ -150,6 +152,8 @@ export interface Project {
   acks: Record<string, Ack>;
   successorQuestions: SuccessorQuestion[];
   audit: AuditEntry[];
+  /** Round 3: set for a shared handover loaded from the database; your role comes from membership */
+  cloud?: { role: Role };
   /** Round 3: LLM proposer settings and cached proposals */
   llm?: LlmState;
   isDemo?: boolean;
