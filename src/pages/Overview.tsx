@@ -4,6 +4,7 @@ import { Tick } from '../ui';
 import { CountUp } from '../motion';
 import { STATUS_META } from '../meta';
 import { fmtDate } from '../lib/text';
+import { TeamPanel } from '../components/Account';
 
 const CELL: Record<FieldCell['state'], { label: string; cls: string }> = {
   filled: { label: 'Evidenced', cls: 'ok' },
@@ -106,6 +107,8 @@ export default function Overview({ go }: { go: (p: string) => void }) {
           </table>
         </div>
       </section>
+
+      <TeamPanel />
 
       <section className="card">
         <h3>Audit log</h3>

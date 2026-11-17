@@ -13,6 +13,7 @@ import Ledger from './pages/Ledger';
 import Interview from './pages/Interview';
 import Review from './pages/Review';
 import Handover from './pages/Handover';
+import { JoinScreen } from './components/Account';
 
 const PAGES: { id: string; label: string; step?: string; roles: Role[] }[] = [
   { id: 'overview', label: 'Overview', roles: ['reviewer', 'leaver'] },
@@ -27,9 +28,22 @@ const spring = reducedMotion() ? { duration: 0 } : { type: 'spring' as const, st
 
 const ROLE_HOME: Record<Role, string> = { reviewer: 'overview', leaver: 'interview', successor: 'handover' };
 
+const JOIN = /^\/join\/([0-9a-f]{20,64})$/i;
+
+function SaveBadge() {
+  const { save, isCloud, reloadCloud } = useStore();
+  if (!isCloud) return null;
+  if (save.state === 'error') {
+    return <span className="save-badge bad" role="alert" title={save.error}>Not saved: {save.error} <button className="link" onClick={reloadCloud}>Reload</button></span>;
+  }
+  return <span className={`save-badge ${save.state}`} role="status">{save.state === 'saved' ? 'Saved' : save.state === 'saving' ? 'Saving…' : 'Unsaved changes'}</span>;
+}
+
 function Shell() {
-  const { project, analysis, role, setRole, open } = useStore();
+  const { project, analysis, role, setRole, open, isCloud, userName } = useStore();
   const [page, setPage] = useState('overview');
+  const [join, setJoin] = useState(() => JOIN.exec(window.location.pathname)?.[1] ?? '');
+  const leaveJoin = () => { setJoin(''); window.history.replaceState(null, '', '/'); };
   const [pass, setPass] = useState<PassInfo | null>(null);
 
   useEffect(() => {
@@ -38,6 +52,7 @@ function Shell() {
   }, [role, page]);
   useEffect(() => { window.scrollTo(0, 0); }, [page]);
 
+  if (join && !project) return <><Header dark /><main className="wrap join-wrap"><JoinScreen token={join} done={leaveJoin} /></main><Footer /></>;
   if (!project || !analysis) return <><Header dark /><main><Home /></main><Footer /></>;
 
   const openQs = analysis.questions.filter((q) => !project.answers[q.id]).length;
@@ -61,6 +76,13 @@ function Shell() {
           <div className="proj-name" title={project.description}>{project.name}</div>
           <button className="link small" onClick={() => open(null)}>All handovers</button>
         </div>
+        {isCloud ? (
+          <div className="roles fixed" aria-label="Your role">
+            <SaveBadge />
+            <span className="muted small">{userName} ·</span>
+            <span className="role-fixed"><b>{role[0].toUpperCase() + role.slice(1)}</b><span>{project.people[role]}</span></span>
+          </div>
+        ) : (
         <div className="roles" role="group" aria-label="View as">
           <span className="muted small">View as</span>
           {(['reviewer', 'leaver', 'successor'] as Role[]).map((r) => (
@@ -71,6 +93,7 @@ function Shell() {
             </button>
           ))}
         </div>
+        )}
       </Header>
       <nav className="steps wrap">
         {PAGES.filter((p) => p.roles.includes(role)).map((p) => (
@@ -111,14 +134,14 @@ function Header({ children, dark }: { children?: React.ReactNode; dark?: boolean
 function Footer() {
   return (
     <footer className="wrap foot muted small">
-      Baton · Team Spectrum · CodePuneThinkers Round 2. Demo data is synthetic, and everything you add stays in this browser.
+      Baton · Team Spectrum · CodePuneThinkers Round 3. Demo data is synthetic. Handovers you start without an account stay in this browser; shared handovers are stored in your team's database with role-based access.
     </footer>
   );
 }
 
 export default function App() {
   const path = window.location.pathname.replace(/\/+$/, '');
-  if (path && path !== '/index.html') return <ErrorBoundary><NotFound /></ErrorBoundary>;
+  if (path && path !== '/index.html' && !JOIN.test(path)) return <ErrorBoundary><NotFound /></ErrorBoundary>;
   return (
     <ErrorBoundary>
     <StoreProvider>
