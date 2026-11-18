@@ -21,8 +21,8 @@ function parseWorkstreams(text: string): Workstream[] {
 const PROOF: { n: number; of?: number; label: string }[] = [
   { n: 14, of: 14, label: 'planted facts recovered' },
   { n: 2, of: 2, label: 'contradictions caught, no false alarms' },
-  { n: 114, of: 114, label: 'quotes verified in 5 real public repos' },
-  { n: 0, label: 'secrets left after masking' },
+  { n: 89, of: 89, label: 'LLM quotes verified on held-out real repos (11 misquotes caught)' },
+  { n: 49, label: 'useful claims on held-out repos, up from 24 with Round 2 rules' },
 ];
 
 function Proof() {
@@ -38,7 +38,7 @@ function Proof() {
           </div>
         ))}
       </dl>
-      <p className="muted small">Measured by <code>scripts/eval.ts</code> on the seeded demo data.</p>
+      <p className="muted small">Measured by <code>scripts/eval.ts</code> on the seeded demo and <code>scripts/eval-llm.ts</code> on two public repos held out from tuning (hand-labelled, see the README).</p>
     </section>
   );
 }
