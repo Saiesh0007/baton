@@ -112,12 +112,18 @@ and add the same variables. `npm run build` makes the production build in `dist/
 
 | | Rules (Round 2) | LLM (Round 3) |
 |---|---|---|
-| Cited quotes found word for word | 114 / 114 | 100 % on every repo (misquotes caught and dropped by the verifier) |
-| Held-out claims judged useful for a successor | 24 / 59 (41 %) | see [`scripts/real/llm/`](scripts/real/llm/) (hand-labelled) |
-| False contradictions, held out | 1 pair | 1 pair |
+| Claims proposed, held out | 59 | 93 |
+| Held-out claims judged useful for a successor | 24 / 59 (41 %) | **49 / 93 (53 %)**: request-promise 22/37, multer 27/56 |
+| Cited quotes found word for word, held out | 52 / 52 | 89 / 89 (11 misquotes caught and dropped by the verifier) |
+| False contradictions, held out | 1 pair | 2 pairs (multer) |
 
-Labels are the team's judgement with the same rule as Round 2 ([`scripts/real/LABELS.md`](scripts/real/LABELS.md)): useful only if a
-successor would want it in a handover *and* the statement is true to its quote.
+The LLM finds **twice as many useful claims** (49 vs 24) at higher precision, and the verifier keeps citation validity at 100 %.
+The held-out repos were not used to tune either proposer; the two false contradiction pairs are reported, not tuned away.
+
+Labelling rule, the same as Round 2 ([`scripts/real/LABELS.md`](scripts/real/LABELS.md)): useful only if a successor would want it in a
+handover *and* the statement is true to its quote. Round 2 labels were made by the team. Round 3 labels
+([`request-promise`](scripts/real/llm/request-promise.labels.md), [`multer`](scripts/real/llm/multer.labels.md)) were drafted by our AI
+coding assistant with that rule and spot-checked by the team; close calls were labelled strictly (an open PR described as done counts as not useful).
 
 ## Limits, stated plainly
 
