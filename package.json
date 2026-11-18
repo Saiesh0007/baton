@@ -7,7 +7,12 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "tsx scripts/test-resync.ts && tsx scripts/eval.ts && tsx scripts/eval.ts --llm",
+    "test:rls": "tsx scripts/rls-check.ts",
+    "eval:real": "tsx scripts/real.ts",
+    "eval:llm": "tsx scripts/eval-llm.ts",
+    "seed:judges": "tsx scripts/seed-judges.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",
@@ -25,6 +30,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
+    "tsx": "^4.19.2",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.30.1",
     "vite": "^6.3.5"

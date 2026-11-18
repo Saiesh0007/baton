@@ -1,6 +1,6 @@
 /**
  * Permission check against the real database (Round 3, improvement 2).
- *   npx tsx scripts/rls-check.ts [apiBase]      apiBase defaults to http://localhost:5180 (npm run dev)
+ *   npx tsx scripts/rls-check.ts [apiBase]      apiBase defaults to http://localhost:5173 (npm run dev)
  * Creates three throwaway accounts (reviewer, leaver, successor), builds a shared handover from the demo
  * (which has a leads-only chat), publishes it, then checks from each account's own session what the
  * database actually returns. Everything it creates is deleted at the end.
@@ -16,7 +16,7 @@ import type { Project, PublishedSnapshot } from '../src/types';
 const envFile = new URL('../.env.local', import.meta.url);
 if (existsSync(envFile)) for (const l of readFileSync(envFile, 'utf8').split(/\r?\n/)) { const m = /^([A-Z0-9_]+)=(.*)$/.exec(l.trim()); if (m && !process.env[m[1]]) process.env[m[1]] = m[2]; }
 const URL_ = process.env.VITE_SUPABASE_URL!, PUB = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!, SECRET = process.env.SUPABASE_SECRET_KEY!;
-const API = process.argv[2] ?? 'http://localhost:5180';
+const API = process.argv[2] ?? 'http://localhost:5173';
 const admin = createClient(URL_, SECRET, { auth: { persistSession: false, autoRefreshToken: false } });
 
 let failed = 0;

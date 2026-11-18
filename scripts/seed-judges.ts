@@ -2,7 +2,7 @@
  * Creates (or resets) three judge accounts that share one handover: a copy of the demo with a
  * first version already published, so each role has something to look at straight away.
  *   npx tsx scripts/seed-judges.ts [apiBase] [outFile]
- * apiBase: where /api/publish runs (default http://localhost:5180, same database as production).
+ * apiBase: where /api/publish runs (default http://localhost:5173, same database as production).
  * outFile: where the logins are written (default ../JUDGE-LOGINS.md, outside the repository).
  * Re-running resets the accounts' passwords and rebuilds their handover from scratch.
  */
@@ -18,7 +18,7 @@ import type { PublishedSnapshot, Role } from '../src/types';
 const envFile = new URL('../.env.local', import.meta.url);
 if (existsSync(envFile)) for (const l of readFileSync(envFile, 'utf8').split(/\r?\n/)) { const m = /^([A-Z0-9_]+)=(.*)$/.exec(l.trim()); if (m && !process.env[m[1]]) process.env[m[1]] = m[2]; }
 const URL_ = process.env.VITE_SUPABASE_URL!, PUB = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!, SECRET = process.env.SUPABASE_SECRET_KEY!;
-const API = process.argv[2] ?? 'http://localhost:5180';
+const API = process.argv[2] ?? 'http://localhost:5173';
 const OUT = process.argv[3] ?? fileURLToPath(new URL('../../JUDGE-LOGINS.md', import.meta.url));
 const admin = createClient(URL_, SECRET, { auth: { persistSession: false, autoRefreshToken: false } });
 
