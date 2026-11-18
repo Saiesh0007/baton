@@ -2,7 +2,7 @@
  * Real-data run: the unchanged pipeline on snapshots of public GitHub repos (scripts/real/*).
  * Run: npx tsx scripts/real.ts [repo]   (prints every claim so it can be hand-checked)
  */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { parseGithub, type GithubExport } from '../src/lib/ingest';
 import { analyze } from '../src/lib/analyze';
 import { redact } from '../src/lib/redact';
@@ -24,6 +24,10 @@ export const REPOS: Record<string, { repo: string; ws: Workstream[] }> = {
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function load(key: string): GithubExport {
   const dir = new URL('./real/', import.meta.url);
+  // a fresh clone has no raw snapshots (they hold contributor emails, so they are not committed);
+  // use the masked export the app serves. Masking runs at import anyway, so the evaluated text is the same.
+  const pub = new URL(`../public/real/${key}.json`, import.meta.url);
+  if (!existsSync(new URL(`${key}.commits.json`, dir)) && existsSync(pub)) return JSON.parse(readFileSync(pub, 'utf8')) as GithubExport;
   const commits = JSON.parse(readFileSync(new URL(`${key}.commits.json`, dir), 'utf8')) as any[];
   const issues = JSON.parse(readFileSync(new URL(`${key}.issues.json`, dir), 'utf8')) as any[];
   const readme = readFileSync(new URL(`${key}.readme.md`, dir), 'utf8');
