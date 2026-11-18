@@ -4,10 +4,10 @@
  *   npx tsx scripts/seed-judges.ts [apiBase] [outFile]
  * apiBase: where /api/publish runs (default http://localhost:5173, same database as production).
  * outFile: where the logins are written (default ../JUDGE-LOGINS.md, outside the repository).
- * Re-running resets the accounts' passwords and rebuilds their handover from scratch.
+ * Passwords are fixed and simple (reviewer@123, leaver@123, successor@123) because they are printed for judges.
+ * Re-running resets the passwords to these and rebuilds the handover from scratch.
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { randomBytes } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
 import { initCloud, signIn, createProject, createInvite, acceptInvite, loadProject, saveProject } from '../src/lib/cloud';
@@ -27,12 +27,12 @@ const ACCOUNTS: { role: Role; email: string; name: string }[] = [
   { role: 'leaver', email: 'judge.leaver@example.com', name: 'Aarav (judge)' },
   { role: 'successor', email: 'judge.successor@example.com', name: 'Diya (judge)' },
 ];
-const pw = () => `Baton-${randomBytes(4).toString('hex')}-${randomBytes(2).toString('hex')}`;
+const pw = (role: Role) => `${role}@123`;
 
 const { data: list } = await admin.auth.admin.listUsers({ perPage: 1000 });
 const creds: Record<string, string> = {};
 for (const a of ACCOUNTS) {
-  const password = pw();
+  const password = pw(a.role);
   creds[a.role] = password;
   const existing = list.users.find((u) => u.email === a.email);
   if (existing) {
@@ -75,7 +75,7 @@ const restricted = p.published?.claims.filter((c) => c.restricted).length ?? 0;
 
 const md = `# Baton: judge logins (keep private)
 
-Generated ${new Date().toISOString()} by scripts/seed-judges.ts. Re-running it resets these passwords and the shared handover.
+Generated ${new Date().toISOString()} by scripts/seed-judges.ts. Re-running it resets the shared handover; the passwords stay the same.
 
 Site: https://baton-phi-three.vercel.app → "Shared handovers" → Sign in.
 All three accounts share one handover: "Spark Fest tech team (shared, for judges)", v1 already published (${included.length} approved items).
