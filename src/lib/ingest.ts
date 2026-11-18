@@ -154,7 +154,10 @@ export function parseGithub(gh: GithubExport, visibility: Visibility): Ingested 
 
 /** Live import of a public GitHub repository through the REST API (no token, read-only). */
 export async function fetchGithub(input: string, onProgress?: (s: string) => void): Promise<GithubExport> {
-  const m = input.trim().replace(/\.git$/, '').match(/(?:github\.com\/)?([\w.-]+)\/([\w.-]+)\/?$/);
+  const raw = input.trim();
+  if (/^(https?:\/\/)?(www\.)?(gitlab|bitbucket|codeberg)\./i.test(raw)) throw new Error('Only GitHub repositories can be imported directly. For other hosts, export the history as a file and upload it.');
+  if (/^https?:\/\//i.test(raw) && !/github\.com\//i.test(raw)) throw new Error('That is not a github.com link. Enter owner/name or a github.com URL.');
+  const m = raw.replace(/\.git$/, '').match(/(?:github\.com\/)?([\w.-]+)\/([\w.-]+)\/?$/);
   if (!m) throw new Error('Enter a repository as owner/name or a github.com URL.');
   const repo = `${m[1]}/${m[2]}`;
   const api = `https://api.github.com/repos/${repo}`;
@@ -189,8 +192,11 @@ export function ingestFile(fileName: string, content: string, visibility: Visibi
   const base = fileName.replace(/\.[^.]+$/, '');
   if (lower.endsWith('.csv')) return parseTasks(base, content, visibility);
   if (lower.endsWith('.json')) {
-    const data = JSON.parse(content);
-    if (data && !Array.isArray(data) && (data.commits || data.pulls) && data.repo) return parseGithub(data as GithubExport, visibility);
+    let data: unknown;
+    try { data = JSON.parse(content); } catch { throw new Error('This is not valid JSON. Upload a Discord or Slack chat export, or a GitHub export.'); }
+    if (!data || typeof data !== 'object') throw new Error('This JSON has no messages or commits in it.');
+    const d = data as Partial<GithubExport>;
+    if (!Array.isArray(data) && (d.commits || d.pulls) && d.repo) return parseGithub(data as GithubExport, visibility);
     return parseChat(base, data, visibility);
   }
   return parseNotes(base, content, visibility);

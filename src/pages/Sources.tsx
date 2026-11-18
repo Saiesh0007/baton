@@ -34,7 +34,18 @@ export default function Sources({ go }: { go: (p: string) => void }) {
   const [resyncing, setResyncing] = useState<string | null>(null);
   if (!project || !analysis) return null;
 
-  const add = (items: Ingested[], llmCache?: Record<string, LlmClaim[]>) => {
+  /** Add imported sources. Empty imports and exact repeats of a source already here are refused with a reason. */
+  const add = (all: Ingested[], llmCache?: Record<string, LlmClaim[]>): boolean => {
+    const problems: string[] = [];
+    const sig = (chunks: { text: string }[]) => chunks.map((c) => c.text.trim()).sort().join('\n');
+    const items = all.filter((i) => {
+      if (!i.chunks.length) { problems.push(`"${i.source.name}" has no text to import.`); return false; }
+      const twin = project.sources.find((s) => s.kind === i.source.kind && sig(project.chunks.filter((c) => c.sourceId === s.id)) === sig(i.chunks));
+      if (twin) { problems.push(`"${i.source.name}" is already imported as "${twin.name}". To bring in a newer version, use Re-sync on that source.`); return false; }
+      return true;
+    });
+    setErr(problems.join(' '));
+    if (!items.length) return false;
     const total = items.reduce((n, i) => n + i.chunks.length, 0);
     const red = items.reduce((n, i) => n + i.source.redactions.reduce((m, r) => m + r.count, 0), 0);
     update(
@@ -44,7 +55,7 @@ export default function Sources({ go }: { go: (p: string) => void }) {
       }),
       `Imported ${items.map((i) => i.source.name).join(', ')} (${total} events, ${red} values masked)`,
     );
-    setErr('');
+    return true;
   };
 
   /* A saved copy of a real public repo, the same data scripts/real.ts evaluates; works offline and past the rate limit. */
@@ -80,23 +91,29 @@ export default function Sources({ go }: { go: (p: string) => void }) {
     if (!files?.length) return;
     setErr('');
     const out: Ingested[] = [];
+    const bad: string[] = [];
     for (const f of Array.from(files)) {
       try {
-        if (/\.(docx|pdf)$/i.test(f.name)) throw new Error('.docx/PDF import is planned for Round 3. Please export as Markdown or plain text.');
+        if (/\.(docx?|pdf|pptx?|xlsx?|png|jpe?g|zip)$/i.test(f.name)) throw new Error('this file type cannot be read. Export it as Markdown, plain text, CSV or JSON first.');
+        if (f.size > 5_000_000) throw new Error('the file is larger than 5 MB. Split it or export only the part you need.');
         out.push(ingestFile(f.name, await f.text(), vis));
-      } catch (e) { setErr(`${f.name}: ${(e as Error).message}`); }
+      } catch (e) { bad.push(`${f.name}: ${(e as Error).message}`); }
     }
     if (out.length) add(out);
+    if (bad.length) setErr((prev) => [prev, ...bad].filter(Boolean).join(' '));
   };
 
   const importPaste = () => {
     try {
       const name = paste.name || (paste.kind === 'notes' ? 'Pasted notes' : paste.kind === 'chat' ? 'Pasted chat export' : 'Pasted tasks');
+      let chat: unknown;
+      if (paste.kind === 'chat') {
+        try { chat = JSON.parse(paste.text); } catch { throw new Error('That is not valid JSON. Paste a Discord or Slack chat export, or use Notes for plain text.'); }
+      }
       const item = paste.kind === 'notes' ? parseNotes(name, paste.text, vis)
-        : paste.kind === 'chat' ? parseChat(name, JSON.parse(paste.text), vis)
+        : paste.kind === 'chat' ? parseChat(name, chat, vis)
           : parseTasks(name, paste.text, vis);
-      add([item]);
-      setPaste({ name: '', kind: paste.kind, text: '' });
+      if (add([item])) setPaste({ name: '', kind: paste.kind, text: '' });
     } catch (e) { setErr((e as Error).message); }
   };
 
