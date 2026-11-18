@@ -3,7 +3,7 @@
 Rule (same as Round 2, LABELS.md): **useful** only if a successor would want it in a handover *and* the statement is true to the quote.
 Replace `[ ]` with `[✓]` or `[✗ reason]`.
 
-**Labels drafted by our AI coding assistant with the Round 2 rule, then spot-checked by Saiesh Sutar.** Close calls were labelled strictly: an open PR described as done, or a statement that adds something the quote does not say, counts as not useful.
+**Labels made by our AI coding assistant with the Round 2 rule (not re-checked by hand).** Close calls were labelled strictly: an open PR described as done, or a statement that adds something the quote does not say, counts as not useful.
 
 - [✓] **1.** [uploads-storage/decision/cited] Swallow late busboy errors after teardown to prevent crashes  <- commit 80a2d9d
   > fix: swallow late busboy error after teardown

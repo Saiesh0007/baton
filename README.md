@@ -122,8 +122,8 @@ The held-out repos were not used to tune either proposer; the two false contradi
 
 Labelling rule, the same as Round 2 ([`scripts/real/LABELS.md`](scripts/real/LABELS.md)): useful only if a successor would want it in a
 handover *and* the statement is true to its quote. Round 2 labels were made by the team. Round 3 labels
-([`request-promise`](scripts/real/llm/request-promise.labels.md), [`multer`](scripts/real/llm/multer.labels.md)) were drafted by our AI
-coding assistant with that rule and spot-checked by the team; close calls were labelled strictly (an open PR described as done counts as not useful).
+([`request-promise`](scripts/real/llm/request-promise.labels.md), [`multer`](scripts/real/llm/multer.labels.md)) were made by our AI
+coding assistant with that rule (not re-checked by hand); every label and its reason is public, next to the claim and its quote. Close calls were labelled strictly (an open PR described as done counts as not useful).
 
 ## Limits, stated plainly
 
