@@ -9,6 +9,8 @@ contradictions become a short **exit interview** for the person leaving. A **rev
 
 **Live:** https://baton-phi-three.vercel.app
 
+**Demo video (4 min, the whole workflow):** https://www.youtube.com/watch?v=ezMMvJ2nMQ4
+
 - **No account:** click **Open the demo** and use **View as** (Reviewer / Leaver / Successor) to walk the whole workflow.
 - **With accounts:** sign in under **Shared handovers** to work on one handover as a team, each person in their own role.
 
